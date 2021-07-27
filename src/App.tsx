@@ -3,11 +3,11 @@ import {
   ChakraProvider,
   theme,
 } from "@chakra-ui/react"
-import { LoginPage } from './components/LoginPage'
+import { CodeEditor } from './components/CodeEditor'
 
 export const App = () => (
   <ChakraProvider theme={theme}>
       {/*<ColorModeSwitcher justifySelf="right" />*/}
-      <LoginPage />
+      <CodeEditor />
   </ChakraProvider>
 )
