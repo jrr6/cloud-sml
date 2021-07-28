@@ -7,21 +7,25 @@ import { ProjectView } from './components/ProjectView'
 import { LoginPage } from './components/LoginPage'
 import { Dashboard } from './components/Dashboard'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { useAuthToken } from './hooks/useAuthToken'
 
-export const App = () => (
-  <ChakraProvider theme={theme}>
-    <Router>
-      <Switch>
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route path="/project/:id">
-          <ProjectView />
-        </Route>
-        <Route path="/">
-          <LoginPage />
-        </Route>
-      </Switch>
-    </Router>
-  </ChakraProvider>
-)
+export const App = () => {
+  const { token, setToken } = useAuthToken()
+  console.log(token)
+  return (
+    <ChakraProvider theme={theme}>
+      {token === undefined
+      ? <LoginPage setToken={setToken} />
+      : <Router>
+          <Switch>
+            <Route path="/">
+              <Dashboard setToken={setToken}/>
+            </Route>
+            <Route path="/project/:id">
+              <ProjectView/>
+            </Route>
+          </Switch>
+        </Router>}
+    </ChakraProvider>
+  )
+}

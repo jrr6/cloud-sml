@@ -4,10 +4,8 @@ import {
   Heading, IconButton, Menu, MenuButton, MenuItem,
   MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
   Table,
-  TableCaption,
   Tbody,
   Td, Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
@@ -15,9 +13,14 @@ import {
 } from '@chakra-ui/react'
 import { ColorModeSwitcher } from '../ColorModeSwitcher'
 import { BiChevronDown, IoMdAdd, IoMdDownload } from 'react-icons/all'
+import { useHistory } from 'react-router-dom'
+import { AuthToken } from '../types/authTypes'
 
+type DashboardProps = {
+  setToken: (token: AuthToken | undefined) => any
+}
 
-export const Dashboard = () => {
+export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const dlModalDisclosure = useDisclosure()
   const dlModalOpen = dlModalDisclosure.isOpen
   const onDlModalOpen = dlModalDisclosure.onOpen
@@ -31,6 +34,13 @@ export const Dashboard = () => {
   const downloadFiles = () => {
     console.log("Downloading files...")
     onDlModalClose()
+  }
+
+  const history = useHistory()
+  const logOut = () => {
+    // tell the server we're logging out
+    setToken(undefined)
+    history.push('/')
   }
 
   const rowHoverColor = useColorModeValue("gray.200", "gray.700")
@@ -61,7 +71,7 @@ export const Dashboard = () => {
             </MenuButton>
             <MenuList>
               <MenuItem onClick={onDlModalOpen}>Download Files&hellip;</MenuItem>
-              <MenuItem>Log Out</MenuItem>
+              <MenuItem onClick={logOut}>Log Out</MenuItem>
             </MenuList>
           </Menu>
         </Box>

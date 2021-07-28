@@ -8,21 +8,34 @@ import {
 } from '@chakra-ui/react'
 import React, { FormEvent } from 'react'
 import { ColorModeSwitcher } from '../ColorModeSwitcher'
+import { AuthToken } from '../types/authTypes'
 
-export const LoginPage = () => {
+type LoginPageProps = {
+  setToken: (token: AuthToken) => any
+}
+
+const postLoginReq = (creds: {username: string, password: string}) =>
+  new Promise<AuthToken>((resolve) => setTimeout(() => resolve({token: "mysecretkey"}), 500))
+
+export const LoginPage: React.FC<LoginPageProps> = ({ setToken }) => {
   const [show, setShow] = React.useState(false)
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [loading, setLoading] = React.useState(false)
-  const handleClick = () => setShow(!show)
-  const submit = (evt : FormEvent) => {
+  const handleShowClick = () => setShow(!show)
+
+  const submit = async (evt : FormEvent) => {
     evt.preventDefault()
     setLoading(true);
-    console.log(username, password)
+    const token = await postLoginReq({
+      username,
+      password
+    })
+    setToken(token)
   }
 
   return (
-    <>
+    <Box p={5}>
       <ColorModeSwitcher float="right" />
       <form onSubmit={submit}>
         <Flex p={10} width="full" align="center" justifyContent="center">
@@ -34,12 +47,11 @@ export const LoginPage = () => {
               <Input
                 pr="4.5rem"
                 type={show ? "text" : "password"}
-                fontFamily="monospace"
                 placeholder="password"
                 onChange={evt => setPassword(evt.currentTarget.value)}
               />
               <InputRightElement width="4.5rem">
-                <Button h="1.75rem" size="sm" onClick={handleClick}>
+                <Button h="1.75rem" size="sm" onClick={handleShowClick}>
                   {show ? "Hide" : "Show"}
                 </Button>
               </InputRightElement>
@@ -51,6 +63,6 @@ export const LoginPage = () => {
         </Box>
         </Flex>
       </form>
-    </>
+    </Box>
   )
 }
