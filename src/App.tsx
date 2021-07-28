@@ -3,11 +3,12 @@ import {
   ChakraProvider,
   theme,
 } from "@chakra-ui/react"
-import { CodeEditor } from './components/CodeEditor'
+import { ProjectView } from './components/ProjectView'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
 
 export const App = () => (
   <ChakraProvider theme={theme}>
-      {/*<ColorModeSwitcher justifySelf="right" />*/}
-      <CodeEditor />
+      <ColorModeSwitcher position="absolute" />
+      <ProjectView />
   </ChakraProvider>
 )

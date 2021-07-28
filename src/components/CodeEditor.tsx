@@ -1,6 +1,7 @@
 import React from "react"
 import Editor from "@monaco-editor/react"
 import { language } from "../monaco-config/sml-language"
+import { useColorModeValue } from '@chakra-ui/react'
 
 export const CodeEditor = () => (
   <Editor
@@ -14,5 +15,6 @@ export const CodeEditor = () => (
       // @ts-ignore
       monaco.languages.setMonarchTokensProvider("sml", language)
     }}
+    theme={useColorModeValue("vs", "vs-dark")}
   />
 )
