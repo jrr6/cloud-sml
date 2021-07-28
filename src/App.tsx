@@ -8,7 +8,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher'
 
 export const App = () => (
   <ChakraProvider theme={theme}>
-      <ColorModeSwitcher position="absolute" />
-      <ProjectView />
+      {/*<ColorModeSwitcher position="absolute" />*/}
+      <ProjectView name="5.2 - Datatypes & Polymorphism" />
   </ChakraProvider>
 )
