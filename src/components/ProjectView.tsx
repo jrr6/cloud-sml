@@ -25,6 +25,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
   }
   const [openIdx, setOpenIdx] = React.useState(project.openIdx)
   const [files, setFiles] = React.useState(project.files)
+  const [isSaved, setIsSaved] = React.useState(true)
 
   const onOpen = (fileIdx: number) => {
     setOpenIdx(fileIdx)
@@ -36,9 +37,11 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
   }
 
   const onEdit = (contents: string) => {
+    setIsSaved(false)
     const oldFile = files[openIdx]
     const newFile = {name: oldFile.name, contents: contents, active: oldFile.active}
     setFiles([...files.slice(0, openIdx), newFile, ...files.slice(openIdx + 1)])
+    setIsSaved(true)
   }
 
   const newProject = {...project, files: files, openIdx: openIdx}
@@ -47,7 +50,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
-        <FileList project={newProject} onOpen={onOpen} onToggle={onToggle} />
+        <FileList project={newProject} onOpen={onOpen} onToggle={onToggle} isSaved={isSaved} />
       </GridItem>
 
       {/* Editor */}

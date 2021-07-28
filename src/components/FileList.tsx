@@ -1,12 +1,24 @@
 import React from 'react'
-import { Box, Button, Flex, Heading, List, ListIcon, ListItem, Switch, useColorModeValue } from '@chakra-ui/react'
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  List,
+  ListIcon,
+  ListItem,
+  Switch,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { IoMdDocument, IoMdPlay, MdChevronLeft } from 'react-icons/all'
 import { Project, ProjectFile } from '../types/projectTypes'
 
 type FileListProps = {
   project: Project,
   onToggle: (fileIdx: number) => any,
-  onOpen: (fileIdx: number) => any
+  onOpen: (fileIdx: number) => any,
+  isSaved: boolean
 }
 
 export const FileList: React.FC<FileListProps> = props => {
@@ -35,11 +47,16 @@ export const FileList: React.FC<FileListProps> = props => {
   return (
     <>
       <Flex justifyContent="space-between">
-        <Button leftIcon={<MdChevronLeft />} variant="ghost" textAlign="left">Exit</Button>
+        <Box>
+          <Button leftIcon={<MdChevronLeft />} size="sm" variant="ghost" textAlign="left">Exit</Button>
+          <Badge variant="outline" colorScheme={props.isSaved ? "green" : "yellow"}>
+            {props.isSaved ? "Saved" : "Saving…"}
+          </Badge>
+        </Box>
         <Button leftIcon={<IoMdPlay color="green" />}>Run</Button>
       </Flex>
       <Heading as="h3" size="md" marginTop={4}>{projName}</Heading>
-      <List marginTop={2} spacing={3} w="100%">
+      <List marginTop={2} spacing={1} w="100%">
         {fileListItems}
       </List>
     </>
