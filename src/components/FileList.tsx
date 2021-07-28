@@ -18,6 +18,7 @@ type FileListProps = {
   project: Omit<Project, "uuid">,
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
+  onClose: () => any,
   isSaved: boolean
 }
 
@@ -48,7 +49,11 @@ export const FileList: React.FC<FileListProps> = props => {
     <>
       <Flex justifyContent="space-between">
         <Box>
-          <Button leftIcon={<MdChevronLeft />} size="sm" variant="ghost" textAlign="left">Exit</Button>
+          <Button leftIcon={<MdChevronLeft />}
+                  size="sm"
+                  variant="ghost"
+                  textAlign="left"
+                  onClick={_ => props.onClose()}>Exit</Button>
           <Badge variant="outline" colorScheme={props.isSaved ? "green" : "yellow"}>
             {props.isSaved ? "Saved" : "Saving…"}
           </Badge>

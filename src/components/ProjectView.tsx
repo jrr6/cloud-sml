@@ -7,15 +7,16 @@ import {
   GridItem,
   useColorModeValue
 } from '@chakra-ui/react'
+import { useHistory, useParams } from 'react-router-dom'
 import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
 
-type ProjectViewProps = { name: string }
+export const ProjectView: React.FC = () => {
+  const { id } = useParams()
 
-export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
   // TODO: actually fetch the project
   const project = {
-    name: name,
+    name: '5.2 - Datatypes & Polymorphism',
     openIdx: 1,
     files: [
       {name: "task2.sml", contents: "(* Functions are values! *)", active: false},
@@ -27,6 +28,8 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
   const [files, setFiles] = React.useState(project.files)
   const [isSaved, setIsSaved] = React.useState(true)
 
+  const history = useHistory()
+
   const onOpen = (fileIdx: number) => {
     setOpenIdx(fileIdx)
   }
@@ -35,13 +38,16 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
     const newFile = {name: oldFile.name, contents: oldFile.contents, active: !oldFile.active}
     setFiles([...files.slice(0, fileIdx), newFile, ...files.slice(fileIdx + 1)])
   }
-
   const onEdit = (contents: string) => {
     setIsSaved(false)
     const oldFile = files[openIdx]
     const newFile = {name: oldFile.name, contents: contents, active: oldFile.active}
     setFiles([...files.slice(0, openIdx), newFile, ...files.slice(openIdx + 1)])
     setIsSaved(true)
+  }
+  const onClose = () => {
+    // save stuff & shut down stuff
+    history.push("/dashboard")
   }
 
   const newProject = {...project, files: files, openIdx: openIdx}
@@ -50,7 +56,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ name }) => {
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
-        <FileList project={newProject} onOpen={onOpen} onToggle={onToggle} isSaved={isSaved} />
+        <FileList project={newProject} onOpen={onOpen} onToggle={onToggle} onClose={onClose} isSaved={isSaved} />
       </GridItem>
 
       {/* Editor */}
