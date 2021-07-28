@@ -1,7 +1,7 @@
-import React, { useEffect } from "react"
+import React from "react"
 import Editor from "@monaco-editor/react"
 import { language } from "../monaco-config/sml-language"
-import { color, useColorMode, useColorModeValue } from '@chakra-ui/react'
+import { useColorMode, useColorModeValue } from '@chakra-ui/react'
 import { ProjectFile } from '../types/projectTypes'
 
 type CodeEditorProps = {

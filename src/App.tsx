@@ -5,10 +5,12 @@ import {
 } from "@chakra-ui/react"
 import { ProjectView } from './components/ProjectView'
 import { ColorModeSwitcher } from './ColorModeSwitcher'
+import { LoginPage } from './components/LoginPage'
+import { Dashboard } from './components/Dashboard'
 
 export const App = () => (
   <ChakraProvider theme={theme}>
-      {/*<ColorModeSwitcher position="absolute" />*/}
-      <ProjectView name="5.2 - Datatypes & Polymorphism" />
+      {/*<ProjectView name="5.2 - Datatypes & Polymorphism" />*/}
+    <Dashboard />
   </ChakraProvider>
 )

@@ -15,7 +15,7 @@ import { IoMdDocument, IoMdPlay, MdChevronLeft } from 'react-icons/all'
 import { Project, ProjectFile } from '../types/projectTypes'
 
 type FileListProps = {
-  project: Project,
+  project: Omit<Project, "uuid">,
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
   isSaved: boolean
