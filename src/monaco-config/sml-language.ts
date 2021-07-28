@@ -56,8 +56,8 @@ export const language = {
     ],
 
     comment: [
-      [/[^\(*]+/, 'comment' ],
-      [/\(\*/,    'comment', '@push' ],    // nested comment
+      [/[^\*\)]+/, 'comment' ],
+      // [/\(\*/,    'comment', '@push' ],    // nested comment -- we don't want these!
       [/\*\)/,    'comment', '@pop'  ], // alternative: "\\*\\)"
       [/[\)*]+/, 'comment' ]
     ],
