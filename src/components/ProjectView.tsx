@@ -16,7 +16,10 @@ export const ProjectView: React.FC = () => {
 
   // TODO: actually fetch the project
   const project = {
+    uuid: 'daufdaf783-aof9393',
     name: '5.2 - Datatypes & Polymorphism',
+    modificationDate: new Date(),
+    creationDate: new Date(),
     openIdx: 1,
     files: [
       {name: "task2.sml", contents: "(* Functions are values! *)", active: false},

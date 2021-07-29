@@ -15,7 +15,7 @@ import { IoMdDocument, IoMdPlay, MdChevronLeft } from 'react-icons/all'
 import { Project, ProjectFile } from '../types/projectTypes'
 
 type FileListProps = {
-  project: Omit<Project, "uuid">,
+  project: Project,
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
   onClose: () => any,
@@ -27,7 +27,7 @@ export const FileList: React.FC<FileListProps> = props => {
   const openIdx: number = props.project.openIdx
   const projName: string = props.project.name
 
-  const listHoverColor = useColorModeValue("gray.200", "gray.700")
+  const listHoverColor = useColorModeValue("gray.300", "gray.700")
   const fileListItems = files.map ((file, idx) => (
     <ListItem w="100%" p={1} cursor="pointer" _hover={{background: listHoverColor}}
               key={file.name} background={idx === openIdx ? listHoverColor : "default"}>

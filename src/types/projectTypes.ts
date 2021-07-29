@@ -7,6 +7,8 @@ export type ProjectFile = {
 export type Project = {
   uuid: string,
   name: string,
+  modificationDate: Date,
+  creationDate: Date,
   files: Array<ProjectFile>,
   openIdx: number
 }

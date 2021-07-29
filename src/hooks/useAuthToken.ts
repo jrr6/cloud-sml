@@ -8,7 +8,7 @@ type TokenOps = {
 
 export const useAuthToken = (): TokenOps => {
   const getToken = (): AuthToken | undefined => {
-    const tokenString = sessionStorage.getItem('token');
+    const tokenString = localStorage.getItem('token');
     if (tokenString !== null) {
       const userToken = JSON.parse(tokenString);
       return userToken?.token
@@ -20,9 +20,9 @@ export const useAuthToken = (): TokenOps => {
   const [token, setToken] = useState<AuthToken | undefined>(getToken())
   const saveToken = (userToken: AuthToken | undefined) => {
     if (userToken === undefined) {
-      sessionStorage.removeItem('token')
+      localStorage.removeItem('token')
     } else {
-      sessionStorage.setItem('token', JSON.stringify(userToken))
+      localStorage.setItem('token', JSON.stringify(userToken))
     }
     setToken(userToken)
   }

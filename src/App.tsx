@@ -18,11 +18,11 @@ export const App = () => {
       ? <LoginPage setToken={setToken} />
       : <Router>
           <Switch>
-            <Route path="/">
-              <Dashboard setToken={setToken}/>
-            </Route>
             <Route path="/project/:id">
               <ProjectView/>
+            </Route>
+            <Route path="/">
+              <Dashboard setToken={setToken}/>
             </Route>
           </Switch>
         </Router>}

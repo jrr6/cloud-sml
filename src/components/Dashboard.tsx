@@ -13,8 +13,10 @@ import {
 } from '@chakra-ui/react'
 import { ColorModeSwitcher } from '../ColorModeSwitcher'
 import { BiChevronDown, IoMdAdd, IoMdDownload } from 'react-icons/all'
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link as RouterLink } from 'react-router-dom'
 import { AuthToken } from '../types/authTypes'
+import { Project } from '../types/projectTypes'
+import { beforeNowString } from '../util/TimeDiff'
 
 type DashboardProps = {
   setToken: (token: AuthToken | undefined) => any
@@ -43,11 +45,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
     history.push('/')
   }
 
+  const openProject = (uuid: string) => {
+    history.push(`/project/${uuid}`)
+  }
+
+  const projects = [
+    {
+      uuid: 'daufdaf783-aof9393',
+      modificationDate: new Date(2021, 6, 28, 15, 14, 0, 0),
+      creationDate: new Date(2019, 0, 1, 0, 0, 0, 0),
+      name: '5.2 - Datatypes & Polymorphism',
+      openIdx: 1,
+      files: [
+        {name: "task2.sml", contents: "(* Functions are values! *)", active: false},
+        {name: "task3.sml", contents: "fun fact 0 = 1\n  | fact n = n * fact (n - 1)", active: true},
+        {name: "task4.sml", contents: "val () = print \"Hello, world!\"", active: true}
+      ]
+    }
+  ]
+
   const rowHoverColor = useColorModeValue("gray.200", "gray.700")
-  const rowEls = ["Playground", "5.1 - Lists & Structural Induction", "5.2 - Datatypes & Polymorphism"].map((e : string) => (
-    <Tr cursor="pointer" _hover={{background: rowHoverColor}} key={e}>
-      <Td>{e}</Td>
-      <Td>3 hours ago</Td>
+  const rowEls = projects.map((proj : Project) => (
+    <Tr cursor="pointer" _hover={{background: rowHoverColor}}
+        key={proj.uuid} id={proj.uuid}
+        onClick={() => openProject(proj.uuid)}>
+        <Td>{proj.name}</Td>
+        <Td>{beforeNowString(proj.modificationDate)}</Td>
     </Tr>
   ))
 
