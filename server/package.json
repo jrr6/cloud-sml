@@ -1,0 +1,25 @@
+{
+  "name": "cloud-sml-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsc --esModuleInterop index.ts && node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jrr6/cloud-sml.git"
+  },
+  "keywords": [],
+  "author": "jrr6",
+  "bugs": {
+    "url": "https://github.com/jrr6/cloud-sml/issues"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}

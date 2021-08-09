@@ -15,7 +15,14 @@ type LoginPageProps = {
 }
 
 const postLoginReq = (creds: {username: string, password: string}) =>
-  new Promise<AuthToken>((resolve) => setTimeout(() => resolve({token: "mysecretkey"}), 500))
+  // new Promise<AuthToken>((resolve) => setTimeout(() => resolve({token: "mysecretkey"}), 500))
+  fetch('http://localhost:8081/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(creds)
+  }).then(data => data.json())
 
 export const LoginPage: React.FC<LoginPageProps> = ({ setToken }) => {
   const [show, setShow] = React.useState(false)
