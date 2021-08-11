@@ -1,0 +1,17 @@
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: cloud-sml-server
+  database:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: sDTxh0i2iN@R_!8kleSF
+    restart: always
+    ports:
+      - 27017:27017
+    container_name: cloud-sml-db
+    volumes:
+      - ./db:/data/db
