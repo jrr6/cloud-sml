@@ -1,8 +1,9 @@
 import express, { Express, RequestHandler } from 'express'
+import * as path from 'path'
 import cors from 'cors'
 import { json, urlencoded } from 'body-parser'
 import { connect } from 'mongoose'
-import { NoIdUser, User, UserModel } from './User'
+import { NoIdUser, User, UserModel } from './models/User'
 import { compare, hash } from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
 
@@ -25,7 +26,7 @@ connect(DB_URI, { useNewUrlParser: true })
 
 // TODO: Move register route to own file in routes/
 const SALT_ROUNDS = 10
-type UserRegistration = Omit<NoIdUser, 'projectIds'>
+type UserRegistration = Omit<NoIdUser, 'projects'>
 type RegistrationResponse = { message: string }
 app.post('/register', async (req, res) => {
   const user: UserRegistration = req.body
@@ -37,7 +38,7 @@ app.post('/register', async (req, res) => {
     const newUser = new UserModel({
       username: req.body.username,
       password: newPassword,
-      projectIds: []
+      projects: []
     })
     await newUser.save()
     return res.status(200).json({ message: 'Success' })
@@ -106,8 +107,8 @@ app.get('/isAuthenticated', verifyJWT, (req, res) => {
   res.status(200).json({ message: 'Logged in', isLoggedIn: true, username: req.user!.username })
 })
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-// });
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+})
 
 app.listen(8081, () => console.log('Server is running on http://localhost:8081/'))

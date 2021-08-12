@@ -14,11 +14,9 @@ export const useAuthToken = (): TokenOps => {
   const [token, setToken] = useState<AuthToken>(getToken())
   const saveToken = (userToken: AuthToken) => {
     if (userToken === null) {
-      console.log('empty token')
       localStorage.removeItem('token')
     } else {
       localStorage.setItem('token', userToken)
-      console.log('token set')
     }
     setToken(JSON.stringify(userToken))
   }
