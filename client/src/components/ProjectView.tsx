@@ -10,13 +10,16 @@ import {
 import { useHistory, useParams } from 'react-router-dom'
 import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
+import { AuthToken } from '../types/authTypes'
 
-export const ProjectView: React.FC = () => {
+type ProjectViewProps = { token: AuthToken }
+
+export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   const { id } = useParams()
 
   // TODO: actually fetch the project
   const project = {
-    uuid: 'daufdaf783-aof9393',
+    workspaceId: 'daufdaf783-aof9393',
     name: '5.2 - Datatypes & Polymorphism',
     modificationDate: new Date(),
     creationDate: new Date(),
@@ -59,7 +62,7 @@ export const ProjectView: React.FC = () => {
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
-        <FileList project={newProject} onOpen={onOpen} onToggle={onToggle} onClose={onClose} isSaved={isSaved} />
+        <FileList project={newProject} token={token} onOpen={onOpen} onToggle={onToggle} onClose={onClose} isSaved={isSaved} />
       </GridItem>
 
       {/* Editor */}

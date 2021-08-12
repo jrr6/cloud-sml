@@ -5,7 +5,7 @@ import { WorkspaceModel } from '../../models/Workspace'
 
 export const registerWorkspaceHandler = () => {
   router.get('/workspace', verifyJWT, async (req, res) => {
-    const id = (req.body as WorkspaceRequest).workspaceId
+    const id = (req.query as WorkspaceRequest).workspaceId
     const workspace = await WorkspaceModel.findOne({ _id: id })
     if (workspace === null) {
       return res.status(404).json({

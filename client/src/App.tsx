@@ -16,7 +16,10 @@ export const App = () => {
     <ChakraProvider theme={theme}>
       <Router>
         <Switch>
-          <PrivateRoute exact path="/project/:id" component={ProjectView} token={token} />
+          <PrivateRoute exact path="/project/:id"
+                        component={ProjectView}
+                        defaultProps={{token:token}}
+                        token={token} />
           <PrivateRoute exact path="/dashboard"
                         component={Dashboard}
                         defaultProps={{token: token, setToken: setToken}}

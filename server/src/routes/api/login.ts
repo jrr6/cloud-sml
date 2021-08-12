@@ -22,7 +22,7 @@ export const registerLoginHandler = () => {
     }
 
     const jwtPayload = {
-      id: registeredUser._id,
+      _id: registeredUser._id,
       username: registeredUser.username
     }
     try {

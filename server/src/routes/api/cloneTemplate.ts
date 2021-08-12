@@ -32,7 +32,8 @@ export const registerCloneTemplateHandler = () => {
       name: templateToClone.name,
       modificationDate: now,
       creationDate: now,
-      workspaceId: newWorkspaceId
+      workspaceId: newWorkspaceId,
+      openIdx: 0
     }
 
     const user = await UserModel.findOne({ _id: userId })

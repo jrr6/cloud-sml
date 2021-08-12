@@ -1,13 +1,8 @@
 import { Schema, model } from 'mongoose'
-
-type File = {
-  name: string,
-  contents: string,
-  enabled: boolean
-}
+import { ProjectFile } from './User'
 
 export type NoIdWorkspace = {
-  files: File[]
+  files: ProjectFile[]
 }
 
 const projectSchema = new Schema<NoIdWorkspace>({
