@@ -2,21 +2,24 @@ import React from 'react'
 import {
   Box, Button, Flex,
   Heading, IconButton, Menu, MenuButton, MenuItem,
-  MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay,
+  MenuList,
   Table,
   Tbody,
-  Td, Text,
+  Td,
   Th,
   Thead,
   Tr,
   useColorModeValue, useDisclosure
 } from '@chakra-ui/react'
 import { ColorModeSwitcher } from './ColorModeSwitcher'
-import { BiChevronDown, IoMdAdd, IoMdCloud, IoMdDownload } from 'react-icons/all'
+import { BiChevronDown, IoMdAdd, IoMdCloud } from 'react-icons/all'
 import { useHistory } from 'react-router-dom'
 import { Project } from '../types/projectTypes'
 import { beforeNowString } from '../util/TimeDiff'
 import { AuthToken } from '../types/authTypes'
+import { ChangePasswordModal } from './dashboard_modals/ChangePasswordModal'
+import { DownloadModal } from './dashboard_modals/DownloadModal'
+import { NewProjectModal } from './dashboard_modals/NewProjectModal'
 
 type DashboardProps = {
   setToken: (token: AuthToken) => any
@@ -24,18 +27,12 @@ type DashboardProps = {
 
 export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const dlModalDisclosure = useDisclosure()
-  const dlModalOpen = dlModalDisclosure.isOpen
-  const onDlModalOpen = dlModalDisclosure.onOpen
-  const onDlModalClose = dlModalDisclosure.onClose
-
   const newModalDisclosure = useDisclosure()
-  const newModalOpen = newModalDisclosure.isOpen
-  const onNewModalOpen = newModalDisclosure.onOpen
-  const onNewModalClose = newModalDisclosure.onClose
+  const passwordModalDisclosure = useDisclosure()
 
   const downloadFiles = () => {
     console.log("Downloading files...")
-    onDlModalClose()
+    dlModalDisclosure.onClose()
   }
 
   const history = useHistory()
@@ -74,9 +71,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
     </Tr>
   ))
 
-  // const availableProjectTemplates: Array<string> = []
-  const availableProjectTemplates = ["5.3 - Sorting", "5.4 - Graphs"]
-
   return (
     <Box p={5}>
       <Flex justifyContent="space-between">
@@ -93,14 +87,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
                       colorScheme="blue"
                       variant="outline"
                       icon={<IoMdAdd />}
-                      onClick={onNewModalOpen} />
+                      onClick={newModalDisclosure.onOpen} />
           <ColorModeSwitcher />
           <Menu>
             <MenuButton as={Button} variant="ghost" rightIcon={<BiChevronDown />}>
               yourusername
             </MenuButton>
             <MenuList>
-              <MenuItem onClick={onDlModalOpen}>Download Files&hellip;</MenuItem>
+              <MenuItem onClick={passwordModalDisclosure.onOpen}>Change Password&hellip;</MenuItem>
+              <MenuItem onClick={dlModalDisclosure.onOpen}>Download Files&hellip;</MenuItem>
               <MenuItem onClick={logOut}>Log Out</MenuItem>
             </MenuList>
           </Menu>
@@ -119,47 +114,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
       </Table>
 
       {/* New project modal */}
-      <Modal isOpen={newModalOpen} onClose={onNewModalClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>New Project</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {
-              availableProjectTemplates.length === 0
-                ? <Text fontSize="lg">No templates available</Text>
-                : <Table variant="simple">
-                    <Tbody>
-                      {availableProjectTemplates.map((e : string) => (
-                        <Tr key={e}>
-                          <Td>{e}</Td>
-                          <Td><Button colorScheme="blue" leftIcon={<IoMdDownload />}>Add</Button></Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <NewProjectModal isOpen={newModalDisclosure.isOpen}
+                       onOpen={newModalDisclosure.onOpen}
+                       onClose={newModalDisclosure.onClose} />
 
-      {/* Download modal */}
-      <Modal isOpen={dlModalOpen} onClose={onDlModalClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Download Files</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            A copy of all of your Cloud SML files will be downloaded to your computer. This process may take several moments. Would you like to proceed?
-          </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={downloadFiles}>
-              Download Files
-            </Button>
-            <Button variant="ghost" onClick={onDlModalClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <DownloadModal isOpen={dlModalDisclosure.isOpen}
+                     onOpen={dlModalDisclosure.onOpen}
+                     onClose={dlModalDisclosure.onClose}
+                     downloadFiles={downloadFiles} />
+
+      <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
+                           onOpen={passwordModalDisclosure.onOpen}
+                           onClose={passwordModalDisclosure.onClose} />
+
     </Box>
   )
 }

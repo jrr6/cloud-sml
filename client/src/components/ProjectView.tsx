@@ -50,7 +50,7 @@ export const ProjectView: React.FC = () => {
   }
   const onClose = () => {
     // save stuff & shut down stuff
-    history.push("/")
+    history.push("/dashboard")
   }
 
   const newProject = {...project, files: files, openIdx: openIdx}

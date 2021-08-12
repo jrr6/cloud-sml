@@ -45,7 +45,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
         }
       })
         .then(res => res.json())
-        .then(data => data.isLoggedIn ? history.push('/dashboard') : null)
+        .then(data => data.isLoggedIn ? history.push('/dashboard') : setToken(null))
     }
   }, [])
 
@@ -89,7 +89,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
                 onChange={evt => setPassword(evt.currentTarget.value)}
               />
               <InputRightElement width="4.5rem">
-                <Button h="1.75rem" size="sm" onClick={handleShowClick}>
+                <Button h="1.75rem" size="sm" tabIndex={-1} onClick={handleShowClick}>
                   {show ? "Hide" : "Show"}
                 </Button>
               </InputRightElement>
