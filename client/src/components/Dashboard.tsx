@@ -11,9 +11,9 @@ import {
   Tr,
   useColorModeValue, useDisclosure
 } from '@chakra-ui/react'
-import { ColorModeSwitcher } from '../ColorModeSwitcher'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
 import { BiChevronDown, IoMdAdd, IoMdDownload } from 'react-icons/all'
-import { useHistory, Link as RouterLink } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { AuthToken } from '../types/authTypes'
 import { Project } from '../types/projectTypes'
 import { beforeNowString } from '../util/TimeDiff'

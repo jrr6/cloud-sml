@@ -7,7 +7,7 @@ import {
   Stack
 } from '@chakra-ui/react'
 import React, { FormEvent } from 'react'
-import { ColorModeSwitcher } from '../ColorModeSwitcher'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
 import { AuthToken } from '../types/authTypes'
 
 type LoginPageProps = {
