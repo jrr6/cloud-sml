@@ -8,6 +8,7 @@ import { LoginPage } from './components/LoginPage'
 import { Dashboard } from './components/Dashboard'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { useAuthToken } from './hooks/useAuthToken'
+import { PrivateRoute } from './components/PrivateRoute'
 
 export const App = () => {
   const { token, setToken } = useAuthToken()
@@ -15,12 +16,8 @@ export const App = () => {
     <ChakraProvider theme={theme}>
       <Router>
         <Switch>
-          <Route exact path="/project/:id">
-            <ProjectView/>
-          </Route>
-          <Route exact path="/dashboard">
-            <Dashboard setToken={setToken}/>
-          </Route>
+          <PrivateRoute exact path="/project/:id" component={ProjectView} token={token} />
+          <PrivateRoute exact path="/dashboard" component={Dashboard} defaultProps={{setToken: setToken}} token={token} />
           <Route path="/">
             <LoginPage token={token} setToken={setToken} />
           </Route>

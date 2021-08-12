@@ -16,9 +16,7 @@ export const beforeNowString = (d: Date): string => {
   }
 
   const hrsDiff = Math.floor(milliDiff / MILLIS_PER_HOUR)
-  if (hrsDiff < 1) {
-    return "Less than an hour ago"
-  } else if (hrsDiff < 24) {
+  if (hrsDiff < 24) {
     return `${hrsDiff} hour${hrsDiff > 1 ? "s" : ""} ago`
   }
 
