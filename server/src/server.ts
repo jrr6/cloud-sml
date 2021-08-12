@@ -31,7 +31,7 @@ app.post('/register', async (req, res) => {
   const user: UserRegistration = req.body
   const isDuplicate = await UserModel.findOne({ username: user.username })
   if (isDuplicate) {
-    return res.status(400).json({ message: 'Account with specified username already exists.' })
+    return res.status(401).json({ message: 'Account with specified username already exists.' })
   } else {
     const newPassword = await hash(user.password, SALT_ROUNDS)
     const newUser = new UserModel({
@@ -52,20 +52,21 @@ const promisify: (_ : Function) => (..._: any[]) => Promise<any> = (jwtFun : Fun
     jwtErr === null ? res(jwtRes) : rej(jwtErr)
   )
 })
+type LoginResponse = { message: string, token?: string }
 const TOKEN_EXPIRATION_TIME_SEC = 60 * 60 * 24
 const JWT_SIGNING_KEY = 'i4QhE*5RIQcKqueP!ptlNGnx&CFQs4RhI*X$7D8f4^6KsBqH!o0dEN0WeM*CvX6&lRH^tRVD0&MgolR0#aT3UOhFY897W0lE2^4h'
 app.post('/login', async (req, res) => {
   const submittedUser: UserRegistration = req.body
   const registeredUser: User | null = await UserModel.findOne({ username: submittedUser.username })
   if (registeredUser === null) {
-    return res.status(404).json({
+    return res.status(401).json({
       message: 'Invalid username or password'
     })
   }
 
   const isPasswordCorrect = await compare(submittedUser.password, registeredUser.password)
   if (!isPasswordCorrect) {
-    return res.status(400).json({ message: 'Invalid username or password' })
+    return res.status(401).json({ message: 'Invalid username or password' })
   }
 
   const jwtPayload = {
@@ -76,16 +77,16 @@ app.post('/login', async (req, res) => {
     const token: string = await promisify(sign)(jwtPayload, JWT_SIGNING_KEY, { expiresIn: TOKEN_EXPIRATION_TIME_SEC })
     return res.json({ message: 'Success', token: 'Bearer ' + token })
   } catch {
-    return res.status(400).json({ message: 'Invalid username or password' })
+    return res.status(401).json({ message: 'Invalid username or password' })
   }
 })
 
-type JWTResponse = { message: string, isLoggedIn: boolean }
+type JWTResponse = { message: string, isLoggedIn: boolean, username?: string }
 const verifyJWT: RequestHandler = (req, res, next) => {
   const tokenHeader = req.headers['x-access-token'] as string | undefined
   const token = tokenHeader?.split(' ')[1]
   if (token === undefined) {
-    return res.status(400).json({ message: 'Invalid token', isLoggedIn: false })
+    return res.status(401).json({ message: 'Invalid token', isLoggedIn: false })
   }
   promisify(verify)(token, JWT_SIGNING_KEY)
     .then(decoded => {
@@ -95,13 +96,13 @@ const verifyJWT: RequestHandler = (req, res, next) => {
       }
       next()
     })
-    .catch(_ => res.status(400).json({
+    .catch(_ => res.status(401).json({
       message: 'Invalid token',
       isLoggedIn: false
     }))
 }
 
-app.get('/testEndpoint', verifyJWT, (req, res) => {
+app.get('/isAuthenticated', verifyJWT, (req, res) => {
   res.status(200).json({ message: 'Logged in', isLoggedIn: true, username: req.user!.username })
 })
 

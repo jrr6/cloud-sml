@@ -11,21 +11,21 @@ import { useAuthToken } from './hooks/useAuthToken'
 
 export const App = () => {
   const { token, setToken } = useAuthToken()
-  console.log(token)
   return (
     <ChakraProvider theme={theme}>
-      {token === undefined
-      ? <LoginPage setToken={setToken} />
-      : <Router>
-          <Switch>
-            <Route path="/project/:id">
-              <ProjectView/>
-            </Route>
-            <Route path="/">
-              <Dashboard setToken={setToken}/>
-            </Route>
-          </Switch>
-        </Router>}
+      <Router>
+        <Switch>
+          <Route exact path="/project/:id">
+            <ProjectView/>
+          </Route>
+          <Route exact path="/dashboard">
+            <Dashboard setToken={setToken}/>
+          </Route>
+          <Route path="/">
+            <LoginPage token={token} setToken={setToken} />
+          </Route>
+        </Switch>
+      </Router>
     </ChakraProvider>
   )
 }

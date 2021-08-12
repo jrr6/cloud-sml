@@ -2,29 +2,25 @@ import { useState} from 'react'
 import { AuthToken } from '../types/authTypes'
 
 type TokenOps = {
-  token: AuthToken | undefined,
-  setToken: (token: AuthToken | undefined) => any
+  token: AuthToken,
+  setToken: (token: AuthToken) => any
 }
 
 export const useAuthToken = (): TokenOps => {
-  const getToken = (): AuthToken | undefined => {
-    const tokenString = localStorage.getItem('token');
-    if (tokenString !== null) {
-      const userToken = JSON.parse(tokenString);
-      return userToken?.token
-    } else {
-      return undefined
-    }
+  const getToken = (): AuthToken => {
+    return localStorage.getItem('token');
   }
 
-  const [token, setToken] = useState<AuthToken | undefined>(getToken())
-  const saveToken = (userToken: AuthToken | undefined) => {
-    if (userToken === undefined) {
+  const [token, setToken] = useState<AuthToken>(getToken())
+  const saveToken = (userToken: AuthToken) => {
+    if (userToken === null) {
+      console.log('empty token')
       localStorage.removeItem('token')
     } else {
-      localStorage.setItem('token', JSON.stringify(userToken))
+      localStorage.setItem('token', userToken)
+      console.log('token set')
     }
-    setToken(userToken)
+    setToken(JSON.stringify(userToken))
   }
 
   return {

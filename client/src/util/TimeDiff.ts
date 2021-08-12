@@ -9,7 +9,6 @@ export const beforeNowString = (d: Date): string => {
   const milliDiff = now.getTime() - d.getTime()
 
   const minsDiff = Math.floor(milliDiff / MILLIS_PER_MIN)
-  console.log(now, d)
   if (minsDiff < 1) {
     return "Less than a minute ago"
   } else if (minsDiff < 60) {

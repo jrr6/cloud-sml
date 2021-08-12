@@ -12,14 +12,14 @@ import {
   useColorModeValue, useDisclosure
 } from '@chakra-ui/react'
 import { ColorModeSwitcher } from './ColorModeSwitcher'
-import { BiChevronDown, IoMdAdd, IoMdDownload } from 'react-icons/all'
+import { BiChevronDown, IoMdAdd, IoMdCloud, IoMdDownload } from 'react-icons/all'
 import { useHistory } from 'react-router-dom'
-import { AuthToken } from '../types/authTypes'
 import { Project } from '../types/projectTypes'
 import { beforeNowString } from '../util/TimeDiff'
+import { AuthToken } from '../types/authTypes'
 
 type DashboardProps = {
-  setToken: (token: AuthToken | undefined) => any
+  setToken: (token: AuthToken) => any
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
@@ -41,7 +41,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const history = useHistory()
   const logOut = () => {
     // tell the server we're logging out
-    setToken(undefined)
+    setToken(null)
     history.push('/')
   }
 
@@ -80,7 +80,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
   return (
     <Box p={5}>
       <Flex justifyContent="space-between">
-        <Heading as="h3" size="lg">Cloud SML</Heading>
+        <Box style={{
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}>
+          <IoMdCloud size={30} />
+          <Heading as="h3" size="lg" marginLeft={2}>Cloud SML</Heading>
+        </Box>
         <Box>
           <IconButton aria-label="New project"
                       colorScheme="blue"
