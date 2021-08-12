@@ -7,6 +7,7 @@ import { DB_URI } from './utils/authConfig'
 import { registerLoginHandler } from './routes/api/login'
 import { registerRegisterHandler } from './routes/api/register'
 import { registerIsAuthenticatedHandler } from './routes/api/isAuthenticated'
+import { registerTemplatesHandler } from './routes/api/templates'
 
 const app: Express = express()
 export const router = Router()
@@ -27,6 +28,7 @@ connect(DB_URI, { useNewUrlParser: true })
 registerLoginHandler()
 registerRegisterHandler()
 registerIsAuthenticatedHandler()
+registerTemplatesHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {

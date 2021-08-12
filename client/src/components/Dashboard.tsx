@@ -22,10 +22,11 @@ import { DownloadModal } from './dashboard_modals/DownloadModal'
 import { NewProjectModal } from './dashboard_modals/NewProjectModal'
 
 type DashboardProps = {
+  token: AuthToken,
   setToken: (token: AuthToken) => any
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
   const dlModalDisclosure = useDisclosure()
   const newModalDisclosure = useDisclosure()
   const passwordModalDisclosure = useDisclosure()
@@ -113,15 +114,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
         </Tbody>
       </Table>
 
-      {/* New project modal */}
       <NewProjectModal isOpen={newModalDisclosure.isOpen}
-                       onClose={newModalDisclosure.onClose} />
-
-
+                       onClose={newModalDisclosure.onClose}
+                       token={token} />
       <DownloadModal isOpen={dlModalDisclosure.isOpen}
                      onClose={dlModalDisclosure.onClose}
                      downloadFiles={downloadFiles} />
-
       <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
                            onClose={passwordModalDisclosure.onClose} />
 

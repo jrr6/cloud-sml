@@ -2,7 +2,7 @@ import { User, UserModel } from '../../models/User'
 import { compare } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { JWT_SIGNING_KEY, TOKEN_EXPIRATION_TIME_SEC } from '../../utils/authConfig'
-import { UserRegistration } from '../../types/userTypes'
+import { UserRegistration } from '../../types/serverTypes'
 import { promisify } from '../../utils/fnUtils'
 import { router } from '../../server'
 

@@ -1,5 +1,4 @@
-// TODO: Move register route to own file in routes/
-import { UserRegistration } from '../../types/userTypes'
+import { UserRegistration } from '../../types/serverTypes'
 import { UserModel } from '../../models/User'
 import { hash } from 'bcrypt'
 import { SALT_ROUNDS } from '../../utils/authConfig'

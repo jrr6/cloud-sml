@@ -17,7 +17,10 @@ export const App = () => {
       <Router>
         <Switch>
           <PrivateRoute exact path="/project/:id" component={ProjectView} token={token} />
-          <PrivateRoute exact path="/dashboard" component={Dashboard} defaultProps={{setToken: setToken}} token={token} />
+          <PrivateRoute exact path="/dashboard"
+                        component={Dashboard}
+                        defaultProps={{token: token, setToken: setToken}}
+                        token={token} />
           <Route path="/">
             <LoginPage token={token} setToken={setToken} />
           </Route>

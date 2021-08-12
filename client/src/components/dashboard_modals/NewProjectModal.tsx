@@ -10,13 +10,26 @@ import {
   Text, Tr
 } from '@chakra-ui/react'
 import { IoMdDownload } from 'react-icons/all'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { DashModalProps } from '../../types/modalTypes'
+import { ProjectTemplate } from '../../../../server/src/models/ProjectTemplate'
+import { AuthToken } from '../../types/authTypes'
 
-export const NewProjectModal: React.FC<DashModalProps> = ({ isOpen, onClose }) => {
-  // TODO: fetch templates in here (ideally refreshing each time modal opened)
-  // const availableProjectTemplates: Array<string> = []
-  const availableProjectTemplates = ["5.3 - Sorting", "5.4 - Graphs"]
+export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken}> = ({ isOpen, onClose, token }) => {
+  const [templates, setTemplates] = useState([] as ProjectTemplate[])
+  // Fetch templates anew each time we open the modal (hence isOpen dep)
+  useEffect(() => {
+    if (isOpen && token !== null) {
+      fetch('http://localhost:8081/api/templates', {
+        method: 'GET',
+        headers: {
+          'x-access-token': token
+        }
+      })
+        .then(res => res.json())
+        .then(resBody => setTemplates(resBody.templates))
+    }
+  }, [isOpen])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -26,13 +39,13 @@ export const NewProjectModal: React.FC<DashModalProps> = ({ isOpen, onClose }) =
         <ModalCloseButton />
         <ModalBody>
           {
-            availableProjectTemplates.length === 0
+            templates.length === 0
               ? <Text fontSize="lg" marginBottom={3}>No templates available</Text>
               : <Table variant="simple">
                 <Tbody>
-                  {availableProjectTemplates.map((e : string) => (
-                    <Tr key={e}>
-                      <Td>{e}</Td>
+                  {templates.map(({ _id, name }) => (
+                    <Tr key={_id}>
+                      <Td>{name}</Td>
                       <Td><Button colorScheme="blue" leftIcon={<IoMdDownload />}>Add</Button></Td>
                     </Tr>
                   ))}
