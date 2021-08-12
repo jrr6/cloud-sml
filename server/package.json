@@ -2,9 +2,9 @@
   "name": "cloud-sml-server",
   "version": "0.1.0",
   "description": "",
-  "main": "build/server.js",
+  "main": "build/server/src/server.js",
   "scripts": {
-    "start": "tsc -w & nodemon -q -w build build/server.js"
+    "start": "tsc -w & nodemon -q -w build build/server/src/server.js"
   },
   "repository": {
     "type": "git",

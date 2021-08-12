@@ -6,6 +6,7 @@ import { router } from '../../server'
 
 export const registerRegisterHandler = () => {
   router.post('/register', async (req, res) => {
+    // TODO: use JWT middleware to ensure only admin account can register new users
     const user: UserRegistration = req.body
     const isDuplicate = await UserModel.findOne({ username: user.username })
     if (isDuplicate) {
