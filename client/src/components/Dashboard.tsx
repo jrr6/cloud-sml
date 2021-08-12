@@ -115,17 +115,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
       {/* New project modal */}
       <NewProjectModal isOpen={newModalDisclosure.isOpen}
-                       onOpen={newModalDisclosure.onOpen}
                        onClose={newModalDisclosure.onClose} />
 
 
       <DownloadModal isOpen={dlModalDisclosure.isOpen}
-                     onOpen={dlModalDisclosure.onOpen}
                      onClose={dlModalDisclosure.onClose}
                      downloadFiles={downloadFiles} />
 
       <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
-                           onOpen={passwordModalDisclosure.onOpen}
                            onClose={passwordModalDisclosure.onClose} />
 
     </Box>
