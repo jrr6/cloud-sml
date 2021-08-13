@@ -18,3 +18,5 @@ export type UploadTemplateResponse = { message: string, templateId: string }
 export type ProjectsResponse = { message: string, projects?: Project[] }
 export type ChangePasswordRequest = { oldPassword: string, newPassword: string }
 export type ChangePasswordResponse = { message: string }
+export type SaveFileRequest = { projectId: string, fileIdx: number, newContents: string }
+export type SaveFileResponse = { message: string }

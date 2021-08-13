@@ -76,10 +76,10 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   const performSave = () => new Promise((res, rej) => {
     if (token == null) return rej()
-    console.log('ATTEMPTING SAVE')
     fetch('http://localhost:8081/api/saveFile', {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'x-access-token': token
       },
       body: JSON.stringify({
