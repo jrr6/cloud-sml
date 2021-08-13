@@ -20,3 +20,5 @@ export type ChangePasswordRequest = { oldPassword: string, newPassword: string }
 export type ChangePasswordResponse = { message: string }
 export type SaveFileRequest = { projectId: string, fileIdx: number, newContents: string }
 export type SaveFileResponse = { message: string }
+export type SetOpenFileRequest = { projectId: string, fileIdx: number }
+export type SetOpenFileResponse = { message: string }

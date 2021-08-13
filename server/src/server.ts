@@ -15,6 +15,7 @@ import { registerUserProjectsHandler } from './routes/api/userProjects'
 import { registerChangePasswordHandler } from './routes/api/changePassword'
 import { registerDownloadFilesHandler } from './routes/api/downloadFiles'
 import { registerSaveFileHandler } from './routes/api/saveFile'
+import { registerSetOpenFileHandler } from './routes/api/setOpenFile'
 
 const app: Express = express()
 export const router = Router()
@@ -43,6 +44,7 @@ registerUserProjectsHandler()
 registerChangePasswordHandler()
 registerDownloadFilesHandler()
 registerSaveFileHandler()
+registerSetOpenFileHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {

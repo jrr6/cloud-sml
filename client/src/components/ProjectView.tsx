@@ -38,11 +38,30 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   const onOpen = (fileIdx: number) => {
     if (pendingSave) clearTimeout(pendingSave)
+
+    const doOpen = () => {
+      if (token === null) return
+      setOpenIdx(fileIdx)
+      // Remembering open file is more of a convenience,
+      // so we won't worry about following up on the promise
+      fetch('http://localhost:8081/api/setOpenFile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': token
+        },
+        body: JSON.stringify({
+          projectId: id,
+          fileIdx
+        })
+      })
+    }
+
     if (activeFileContents.current !== undefined) {
       performSave()
-        .then(() => setOpenIdx(fileIdx))
+        .then(() => doOpen())
     } else {
-      setOpenIdx(fileIdx)
+      doOpen()
     }
   }
   const onToggle = (fileIdx: number) => {
