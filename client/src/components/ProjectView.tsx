@@ -81,9 +81,24 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     }
   }
   const onToggle = (fileIdx: number) => {
+    if (token === null) return
     const oldFile = files[fileIdx]
-    const newFile = {name: oldFile.name, contents: oldFile.contents, active: !oldFile.active}
+    const newState = !oldFile.active
+    const newFile = {name: oldFile.name, contents: oldFile.contents, active: newState}
     setFiles([...files.slice(0, fileIdx), newFile, ...files.slice(fileIdx + 1)])
+    // Another "convenience," so we ignore the promise
+    fetch('http://localhost:8081/api/toggleFile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      },
+      body: JSON.stringify({
+        projectId: id,
+        fileIdx,
+        active: newState
+      })
+    })
   }
   const onEdit = (contents: string) => {
     setSaveState(SaveState.Saving)

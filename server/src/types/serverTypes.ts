@@ -22,3 +22,4 @@ export type SaveFileRequest = { projectId: string, fileIdx: number, newContents:
 export type SaveFileResponse = { message: string }
 export type SetOpenFileRequest = { projectId: string, fileIdx: number }
 export type SetOpenFileResponse = { message: string }
+export type ToggleFileRequest = { projectId: string, fileIdx: number, active: boolean }

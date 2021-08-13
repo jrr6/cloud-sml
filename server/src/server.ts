@@ -16,6 +16,7 @@ import { registerChangePasswordHandler } from './routes/api/changePassword'
 import { registerDownloadFilesHandler } from './routes/api/downloadFiles'
 import { registerSaveFileHandler } from './routes/api/saveFile'
 import { registerSetOpenFileHandler } from './routes/api/setOpenFile'
+import { registerToggleFileHandler } from './routes/api/toggleFile'
 
 const app: Express = express()
 export const router = Router()
@@ -45,6 +46,7 @@ registerChangePasswordHandler()
 registerDownloadFilesHandler()
 registerSaveFileHandler()
 registerSetOpenFileHandler()
+registerToggleFileHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {
