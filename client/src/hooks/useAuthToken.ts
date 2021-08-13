@@ -2,8 +2,11 @@ import { useState} from 'react'
 import { AuthToken } from '../types/authTypes'
 
 type TokenOps = {
-  token: AuthToken,
-  setToken: (token: AuthToken) => any
+  auth: {
+    token: AuthToken,
+    username: string
+  },
+  setAuth: (token: AuthToken, username?: string) => any,
 }
 
 export const useAuthToken = (): TokenOps => {
@@ -11,18 +14,29 @@ export const useAuthToken = (): TokenOps => {
     return localStorage.getItem('token');
   }
 
+  const getUsername = (): string => {
+    return localStorage.getItem('username') || ''
+  }
+
   const [token, setToken] = useState<AuthToken>(getToken())
-  const saveToken = (userToken: AuthToken) => {
+  const [username, setUsername] = useState<string>(getUsername())
+  const saveToken = (userToken: AuthToken, username?: string) => {
     if (userToken === null) {
       localStorage.removeItem('token')
+      localStorage.removeItem('username')
     } else {
       localStorage.setItem('token', userToken)
+      localStorage.setItem('username', username || '')
     }
     setToken(userToken)
+    setUsername(username || '')
   }
 
   return {
-    setToken: saveToken,
-    token
+    setAuth: saveToken,
+    auth: {
+      token,
+      username
+    }
   }
 }

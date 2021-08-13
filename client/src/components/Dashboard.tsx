@@ -24,10 +24,11 @@ import { ProjectDescriptor } from '../../../server/src/types/serverTypes'
 
 type DashboardProps = {
   token: AuthToken,
-  setToken: (token: AuthToken) => any
+  clearToken: () => any,
+  username: string
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, username }) => {
   const dlModalDisclosure = useDisclosure()
   const newModalDisclosure = useDisclosure()
   const passwordModalDisclosure = useDisclosure()
@@ -37,7 +38,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
   const history = useHistory()
   const logOut = () => {
     // tell the server we're logging out
-    setToken(null)
+    clearToken()
     history.push('/')
   }
 
@@ -65,21 +66,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
         })))
       })
   }, [])
-
-  // const projects = [
-  //   {
-  //     uuid: 'daufdaf783-aof9393',
-  //     modificationDate: new Date(2021, 6, 28, 15, 14, 0, 0),
-  //     creationDate: new Date(2019, 0, 1, 0, 0, 0, 0),
-  //     name: '5.2 - Datatypes & Polymorphism',
-  //     openIdx: 1,
-  //     files: [
-  //       {name: "task2.sml", contents: "(* Functions are values! *)", active: false},
-  //       {name: "task3.sml", contents: "fun fact 0 = 1\n  | fact n = n * fact (n - 1)", active: true},
-  //       {name: "task4.sml", contents: "val () = print \"Hello, world!\"", active: true}
-  //     ]
-  //   }
-  // ]
 
   const rowHoverColor = useColorModeValue("gray.200", "gray.700")
   const rowEls = projects.map((proj: Project) => (
@@ -111,7 +97,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
           <ColorModeSwitcher />
           <Menu>
             <MenuButton as={Button} variant="ghost" rightIcon={<BiChevronDown />}>
-              yourusername
+              {username}
             </MenuButton>
             <MenuList>
               <MenuItem onClick={passwordModalDisclosure.onOpen}>Change Password&hellip;</MenuItem>
@@ -142,7 +128,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
       <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
                            onClose={passwordModalDisclosure.onClose}
                            token={token}
-                           setToken={setToken} />
+                           clearToken={clearToken} />
 
     </Box>
   )

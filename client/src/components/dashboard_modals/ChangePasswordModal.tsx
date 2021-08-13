@@ -16,8 +16,8 @@ import { useHistory } from 'react-router-dom'
 const MIN_PASSWORD_LENGTH = 8
 
 export const ChangePasswordModal: React.FC<DashModalProps &
-    {token: AuthToken, setToken: (_: AuthToken) => void}
-  > = ({ isOpen, onClose, token, setToken }) => {
+    {token: AuthToken, clearToken: () => any}
+  > = ({ isOpen, onClose, token, clearToken }) => {
   const [current, setCurrent] = React.useState('')
   const [newIn, setNewIn] = React.useState('')
   const [confirm, setConfirm] = React.useState('')
@@ -66,7 +66,7 @@ export const ChangePasswordModal: React.FC<DashModalProps &
           if (res.ok) {
             setLoginError(false)
             setLoading(false)
-            setToken(null)
+            clearToken()
             history.push('/')
           } else {
             setLoading(false)

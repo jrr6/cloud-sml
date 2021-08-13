@@ -14,11 +14,10 @@ import { AuthToken } from '../types/authTypes'
 
 type LoginPageProps = {
   token: AuthToken,
-  setToken: (token: AuthToken) => any
+  setAuth: (token: AuthToken, username?: string) => any,
 }
 
 const postLoginReq = (creds: {username: string, password: string}) =>
-  // new Promise<AuthToken>((resolve) => setTimeout(() => resolve({token: "mysecretkey"}), 500))
   fetch('http://localhost:8081/api/login', {
     method: 'POST',
     headers: {
@@ -27,11 +26,11 @@ const postLoginReq = (creds: {username: string, password: string}) =>
     body: JSON.stringify(creds)
   }).then(data => data.json())
 
-export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ token, setAuth }) => {
   const history = useHistory()
   const [show, setShow] = React.useState(false)
-  const [username, setUsername] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [usernameInput, setUsernameInput] = React.useState('')
+  const [passwordInput, setPasswordInput] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [loginError, setLoginError] = React.useState(false)
   const handleShowClick = () => setShow(!show)
@@ -45,7 +44,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
         }
       })
         .then(res => res.json())
-        .then(data => data.isLoggedIn ? history.push('/dashboard') : setToken(null))
+        .then(data => {
+          if (data.isLoggedIn) {
+            history.push('/dashboard')
+          } else {
+            setAuth(null)
+          }
+        })
     }
   }, [])
 
@@ -54,13 +59,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
     setLoading(true);
     try {
       const res = await postLoginReq({
-        username,
-        password
+        username: usernameInput,
+        password: passwordInput
       })
       if (res.token !== undefined) {
-        setToken(res.token)
+        setAuth(res.token, usernameInput)
         setLoading(false)
         setLoginError(false)
+        setUsernameInput(usernameInput)
         history.push('/dashboard')
       } else {
         setLoading(false)
@@ -80,13 +86,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setToken }) => {
         <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={8} boxShadow="lg">
           <Stack spacing={3}>
             <Input placeholder="username"
-                   onChange={evt => setUsername(evt.currentTarget.value)} />
+                   onChange={evt => setUsernameInput(evt.currentTarget.value)} />
             <InputGroup size="md">
               <Input
                 pr="4.5rem"
                 type={show ? "text" : "password"}
                 placeholder="password"
-                onChange={evt => setPassword(evt.currentTarget.value)}
+                onChange={evt => setPasswordInput(evt.currentTarget.value)}
               />
               <InputRightElement width="4.5rem">
                 <Button h="1.75rem" size="sm" tabIndex={-1} onClick={handleShowClick}>

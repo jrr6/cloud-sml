@@ -11,21 +11,25 @@ import { useAuthToken } from './hooks/useAuthToken'
 import { PrivateRoute } from './components/PrivateRoute'
 
 export const App = () => {
-  const { token, setToken } = useAuthToken()
+  const { auth, setAuth } = useAuthToken()
+  const { token, username } = auth
+
+  const clearToken = () => setAuth(null)
+
   return (
     <ChakraProvider theme={theme}>
       <Router>
         <Switch>
           <PrivateRoute exact path="/project/:id"
                         component={ProjectView}
-                        defaultProps={{token:token}}
+                        defaultProps={{token}}
                         token={token} />
           <PrivateRoute exact path="/dashboard"
                         component={Dashboard}
-                        defaultProps={{token: token, setToken: setToken}}
+                        defaultProps={{token, clearToken, username}}
                         token={token} />
           <Route path="/">
-            <LoginPage token={token} setToken={setToken} />
+            <LoginPage token={token} setAuth={setAuth} />
           </Route>
         </Switch>
       </Router>
