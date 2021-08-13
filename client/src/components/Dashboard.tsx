@@ -34,11 +34,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
 
   const [projects, setProjects] = useState([] as Project[])
 
-  const downloadFiles = () => {
-    console.log("Downloading files...")
-    dlModalDisclosure.onClose()
-  }
-
   const history = useHistory()
   const logOut = () => {
     // tell the server we're logging out
@@ -143,7 +138,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
                        token={token} />
       <DownloadModal isOpen={dlModalDisclosure.isOpen}
                      onClose={dlModalDisclosure.onClose}
-                     downloadFiles={downloadFiles} />
+                     token={token} />
       <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
                            onClose={passwordModalDisclosure.onClose}
                            token={token}

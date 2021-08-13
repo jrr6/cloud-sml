@@ -13,6 +13,7 @@ import { registerUploadTemplateHandler } from './routes/api/uploadTemplate'
 import { registerCloneTemplateHandler } from './routes/api/cloneTemplate'
 import { registerUserProjectsHandler } from './routes/api/userProjects'
 import { registerChangePasswordHandler } from './routes/api/changePassword'
+import { registerDownloadFilesHandler } from './routes/api/downloadFiles'
 
 const app: Express = express()
 export const router = Router()
@@ -39,6 +40,7 @@ registerCloneTemplateHandler()
 registerUploadTemplateHandler()
 registerUserProjectsHandler()
 registerChangePasswordHandler()
+registerDownloadFilesHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {
