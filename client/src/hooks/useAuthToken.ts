@@ -18,7 +18,7 @@ export const useAuthToken = (): TokenOps => {
     } else {
       localStorage.setItem('token', userToken)
     }
-    setToken(JSON.stringify(userToken))
+    setToken(userToken)
   }
 
   return {
