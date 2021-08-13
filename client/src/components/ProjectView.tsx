@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Box, Divider, Flex, Grid, GridItem, useColorModeValue } from '@chakra-ui/react'
-import { Prompt, useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
 import { AuthToken } from '../types/authTypes'
@@ -29,10 +29,26 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   const history = useHistory()
 
   useEffect(() => {
-    window.onbeforeunload = () => {
-      return activeFileContents.current !== undefined
-        ? 'Your changes have not yet been saved. Do you want to continue?'
-        : undefined
+    const confirmation = 'You have unsaved changes, which will be lost if you continue. Are you sure you want to exit?'
+    const interceptor = (e: Event) => {
+      if (activeFileContents.current !== undefined) {
+        e.preventDefault()
+        e.returnValue = false // Chrome makes us do this for some reason
+        return confirmation
+      } else {
+        return undefined
+      }
+    }
+    window.addEventListener('beforeunload', interceptor, false)
+
+    //@ts-ignore returning true is the only way to allow unimpeded navigation, so I don't know why the type prevents it
+    const unblock = history.block((_loc, _act) => {
+      return activeFileContents.current === undefined
+    })
+
+    return () => {
+      unblock();
+      window.removeEventListener('beforeunload', interceptor, false)
     }
   }, [])
 
@@ -149,12 +165,6 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   return (
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
-      {/* Navigation-before-save warning prompt */}
-      <Prompt
-        when={activeFileContents.current !== undefined}
-        message='You have unsaved changes. Are you sure you want to proceed?'
-      />
-
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
         {loaded &&
