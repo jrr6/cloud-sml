@@ -145,7 +145,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
                      onClose={dlModalDisclosure.onClose}
                      downloadFiles={downloadFiles} />
       <ChangePasswordModal isOpen={passwordModalDisclosure.isOpen}
-                           onClose={passwordModalDisclosure.onClose} />
+                           onClose={passwordModalDisclosure.onClose}
+                           token={token}
+                           setToken={setToken} />
 
     </Box>
   )
