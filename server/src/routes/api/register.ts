@@ -18,8 +18,12 @@ export const registerRegisterHandler = () => {
         password: newPassword,
         projects: []
       })
-      await newUser.save()
-      return res.status(200).json({ message: 'Success' })
+      try {
+        await newUser.save()
+        return res.status(200).json({message: 'Success'})
+      } catch {
+        return res.status(500).json({message: 'Failed to register user'})
+      }
     }
   })
 }

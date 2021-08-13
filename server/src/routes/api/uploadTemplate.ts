@@ -12,10 +12,14 @@ export const registerUploadTemplateHandler = () => {
       files
     })
 
-    const templateId = (await newTemplate.save())._id
-    res.status(200).json({
-      message: 'Success',
-      templateId
-    })
+    try {
+      const templateId = (await newTemplate.save())._id
+      return res.status(200).json({
+        message: 'Success',
+        templateId
+      })
+    } catch {
+      return res.status(500).json({ message: 'Failed to save template' })
+    }
   })
 }

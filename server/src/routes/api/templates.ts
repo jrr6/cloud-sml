@@ -4,7 +4,11 @@ import { ProjectTemplateModel } from '../../models/ProjectTemplate'
 
 export const registerTemplatesHandler = () => {
   router.get('/templates', verifyJWT, async (req, res) => {
-    const templates = await ProjectTemplateModel.find()
-    res.status(200).send({ message: 'Success', templates: templates })
+    try {
+      const templates = await ProjectTemplateModel.find()
+      res.status(200).json({ message: 'Success', templates: templates })
+    } catch {
+      res.status(500).json({ message: 'Failed to fetch projects' })
+    }
   })
 }

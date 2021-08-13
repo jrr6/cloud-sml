@@ -12,6 +12,7 @@ import { registerWorkspaceHandler } from './routes/api/project'
 import { registerUploadTemplateHandler } from './routes/api/uploadTemplate'
 import { registerCloneTemplateHandler } from './routes/api/cloneTemplate'
 import { registerUserProjectsHandler } from './routes/api/userProjects'
+import { registerChangePasswordHandler } from './routes/api/changePassword'
 
 const app: Express = express()
 export const router = Router()
@@ -37,6 +38,7 @@ registerWorkspaceHandler()
 registerCloneTemplateHandler()
 registerUploadTemplateHandler()
 registerUserProjectsHandler()
+registerChangePasswordHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {

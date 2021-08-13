@@ -34,10 +34,14 @@ export const registerCloneTemplateHandler = () => {
         message: 'User does not exist'
       })
     }
-    user.projects.push(newProjectId)
-    await user.save()
-    res.status(200).json({
-      message: 'Success'
-    })
+    try {
+      user.projects.push(newProjectId)
+      await user.save()
+      res.status(200).json({
+        message: 'Success'
+      })
+    } catch {
+      res.status(500).json({ message: 'Failed to save project' })
+    }
   })
 }
