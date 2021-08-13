@@ -8,6 +8,7 @@ export type ProjectFile = {
 
 export type NoIdProject = {
   name: string,
+  ownerId: string,
   modificationDate: Date,
   creationDate: Date,
   openIdx: number
@@ -16,6 +17,7 @@ export type NoIdProject = {
 
 const projectSchema = new Schema<NoIdProject>({
   name: { type: String, required: true },
+  ownerId: { type: String, required: true },
   modificationDate: { type: Date, required: true },
   creationDate: { type: Date, required: true },
   openIdx: { type: Number, required: true },

@@ -2,7 +2,7 @@ import React from "react"
 import Editor from "@monaco-editor/react"
 import { language } from "../monaco-config/sml-language"
 import { useColorMode, useColorModeValue } from '@chakra-ui/react'
-import { ProjectFile } from '../../../server/src/models/User'
+import { ProjectFile } from '../../../server/src/models/Project'
 
 type CodeEditorProps = {
   file: ProjectFile,

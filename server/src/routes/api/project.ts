@@ -10,6 +10,10 @@ export const registerWorkspaceHandler = () => {
       return res.status(404).json({
         message: 'Project not found'
       })
+    } else if (project.ownerId !== req.user!._id) {
+      return res.status(401).json({
+        message: 'Not authorized to access requested project'
+      })
     } else {
       return res.status(200).json({
         message: 'Success',

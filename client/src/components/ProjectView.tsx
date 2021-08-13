@@ -35,6 +35,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   const [projName, setProjName] = useState('')
   const [openIdx, setOpenIdx] = useState(0)
   const [isSaved, setIsSaved] = useState(true)
+  const [loaded, setLoaded] = useState(false)
 
   const history = useHistory()
 
@@ -78,6 +79,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
         setFiles(project.files)
         setOpenIdx(project.openIdx)
         setProjName(project.name)
+        setLoaded(true)
       })
   }, [])
 
@@ -85,6 +87,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
+        {loaded &&
         <FileList projName={projName}
                   files={files}
                   openIdx={openIdx}
@@ -93,20 +96,25 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
                   onToggle={onToggle}
                   onClose={onClose}
                   isSaved={isSaved} />
+        }
       </GridItem>
 
       {/* Editor */}
       <GridItem colSpan={5}>
         <Flex>
           <Box><Divider orientation="vertical"/></Box>
-          <CodeEditor file={files[openIdx]} onEdit={onEdit} />
+          {loaded &&
+          <CodeEditor file={files[openIdx]} onEdit={onEdit}/>
+          }
           <Box><Divider orientation="vertical"/></Box>
         </Flex>
       </GridItem>
 
       {/* Terminal */}
       <GridItem colSpan={3}>
+        {loaded &&
         <p>This is where the terminal goes</p>
+        }
       </GridItem>
     </Grid>
   )

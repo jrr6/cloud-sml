@@ -19,6 +19,7 @@ export const registerCloneTemplateHandler = () => {
     const now = new Date()
     const newProject = new ProjectModel({
       name: templateToClone.name,
+      ownerId: userId,
       modificationDate: now,
       creationDate: now,
       openIdx: 0,
