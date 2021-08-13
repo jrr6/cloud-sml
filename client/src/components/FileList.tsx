@@ -14,6 +14,7 @@ import {
 import { IoMdDocument, IoMdPlay, MdChevronLeft } from 'react-icons/all'
 import { ProjectFile } from '../../../server/src/models/Project'
 import { AuthToken } from '../types/authTypes'
+import { SaveState } from './ProjectView'
 
 type FileListProps = {
   projName: string,
@@ -22,7 +23,7 @@ type FileListProps = {
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
   onClose: () => any,
-  isSaved: boolean,
+  saveState: SaveState,
   token: AuthToken
 }
 
@@ -47,6 +48,13 @@ export const FileList: React.FC<FileListProps> = props => {
     </ListItem>
   ))
 
+  const statusColor = props.saveState == SaveState.Saved ? 'green'
+    : props.saveState == SaveState.Saving ? 'yellow'
+      : 'red'
+  const statusText = props.saveState == SaveState.Saved ? 'Saved'
+    : props.saveState == SaveState.Saving ? 'Saving…'
+      : 'Not Saved'
+
   return (
     <>
       <Flex justifyContent="space-between">
@@ -56,8 +64,8 @@ export const FileList: React.FC<FileListProps> = props => {
                   variant="ghost"
                   textAlign="left"
                   onClick={_ => props.onClose()}>Exit</Button>
-          <Badge variant="outline" colorScheme={props.isSaved ? "green" : "yellow"}>
-            {props.isSaved ? "Saved" : "Saving…"}
+          <Badge variant="outline" colorScheme={statusColor}>
+            {statusText}
           </Badge>
         </Box>
         <Button leftIcon={<IoMdPlay color="green" />}>Run</Button>
