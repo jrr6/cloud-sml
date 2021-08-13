@@ -19,7 +19,8 @@ import { AuthToken } from '../types/authTypes'
 import { ChangePasswordModal } from './dashboard_modals/ChangePasswordModal'
 import { DownloadModal } from './dashboard_modals/DownloadModal'
 import { NewProjectModal } from './dashboard_modals/NewProjectModal'
-import { Project } from '../../../server/src/models/User'
+import { Project } from '../../../server/src/models/Project'
+import { ProjectDescriptor } from '../../../server/src/types/serverTypes'
 
 type DashboardProps = {
   token: AuthToken,
@@ -52,7 +53,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
   useEffect(() => {
     if (token === null) return
 
-    fetch('http://localhost:8081/api/projects', {
+    fetch('http://localhost:8081/api/userProjects', {
       method: 'GET',
       headers: {
         'x-access-token': token
@@ -60,7 +61,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
     })
       .then(res => res.json())
       .then(projObj => {
-        setProjects(projObj.projects)
+        const { projects } = projObj
+        // When we get the project from the server, the modificationDate isn't a Date b/c JSON doesn't handle those
+        setProjects(projects.map((proj: Omit<ProjectDescriptor, 'modificationDate'> & {modificationDate: string}) => ({
+          _id: proj._id,
+          name: proj.name,
+          modificationDate: new Date(proj.modificationDate)
+        })))
       })
   }, [])
 
@@ -82,8 +89,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, setToken }) => {
   const rowHoverColor = useColorModeValue("gray.200", "gray.700")
   const rowEls = projects.map((proj: Project) => (
     <Tr cursor="pointer" _hover={{background: rowHoverColor}}
-        key={proj.workspaceId} id={proj.workspaceId}
-        onClick={() => openProject(proj.workspaceId)}>
+        key={proj._id} id={proj._id}
+        onClick={() => openProject(proj._id)}>
         <Td>{proj.name}</Td>
         <Td>{beforeNowString(proj.modificationDate)}</Td>
     </Tr>

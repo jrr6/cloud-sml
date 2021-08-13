@@ -8,10 +8,10 @@ import { registerLoginHandler } from './routes/api/login'
 import { registerRegisterHandler } from './routes/api/register'
 import { registerIsAuthenticatedHandler } from './routes/api/isAuthenticated'
 import { registerTemplatesHandler } from './routes/api/templates'
-import { registerWorkspaceHandler } from './routes/api/workspace'
+import { registerWorkspaceHandler } from './routes/api/project'
 import { registerUploadTemplateHandler } from './routes/api/uploadTemplate'
 import { registerCloneTemplateHandler } from './routes/api/cloneTemplate'
-import { registerProjectsHandler } from './routes/api/projects'
+import { registerUserProjectsHandler } from './routes/api/userProjects'
 
 const app: Express = express()
 export const router = Router()
@@ -36,7 +36,7 @@ registerTemplatesHandler()
 registerWorkspaceHandler()
 registerCloneTemplateHandler()
 registerUploadTemplateHandler()
-registerProjectsHandler()
+registerUserProjectsHandler()
 
 app.use('/api', router)
 app.get('*', (req, res) => {

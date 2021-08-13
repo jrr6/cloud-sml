@@ -15,6 +15,10 @@ export type NoIdProject = {
 }
 
 const projectSchema = new Schema<NoIdProject>({
+  name: { type: String, required: true },
+  modificationDate: { type: Date, required: true },
+  creationDate: { type: Date, required: true },
+  openIdx: { type: Number, required: true },
   files: { type: Array, required: true }
 })
 

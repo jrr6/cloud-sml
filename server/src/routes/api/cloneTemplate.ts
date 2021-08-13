@@ -2,8 +2,8 @@ import { router } from '../../server'
 import { verifyJWT } from './isAuthenticated'
 import { CloneTemplateRequest } from '../../types/serverTypes'
 import { ProjectTemplateModel } from '../../models/ProjectTemplate'
-import { Project, UserModel } from '../../models/User'
-import { WorkspaceModel } from '../../models/Workspace'
+import { UserModel } from '../../models/User'
+import { ProjectModel } from '../../models/Project'
 
 export const registerCloneTemplateHandler = () => {
   router.post('/cloneTemplate', verifyJWT, async (req, res) => {
@@ -16,25 +16,16 @@ export const registerCloneTemplateHandler = () => {
       })
     }
 
-    const workspaceToClone = await WorkspaceModel.findOne({ _id: templateToClone.workspaceId })
-    if (workspaceToClone === null) {
-      return res.status(401).json({
-        message: 'Corrupted template requested'
-      })
-    }
-    const newWorkspace = new WorkspaceModel({
-      files: workspaceToClone.files
-    })
-    const newWorkspaceId: string = (await newWorkspace.save())._id
-
     const now = new Date()
-    const newProject: Project = {
+    const newProject = new ProjectModel({
       name: templateToClone.name,
       modificationDate: now,
       creationDate: now,
-      workspaceId: newWorkspaceId,
-      openIdx: 0
-    }
+      openIdx: 0,
+      files: templateToClone.files
+    })
+    console.log(newProject)
+    const newProjectId = (await newProject.save())._id
 
     const user = await UserModel.findOne({ _id: userId })
     if (user === null) {
@@ -42,11 +33,10 @@ export const registerCloneTemplateHandler = () => {
         message: 'User does not exist'
       })
     }
-    user.projects.push(newProject)
+    user.projects.push(newProjectId)
     await user.save()
     res.status(200).json({
-      message: 'Success',
-      newProject
+      message: 'Success'
     })
   })
 }

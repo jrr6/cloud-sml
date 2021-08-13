@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   Badge,
   Box,
@@ -12,12 +12,13 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { IoMdDocument, IoMdPlay, MdChevronLeft } from 'react-icons/all'
-import { Project, ProjectFile } from '../../../server/src/models/User'
+import { ProjectFile } from '../../../server/src/models/Project'
 import { AuthToken } from '../types/authTypes'
-import { Workspace } from '../../../server/src/models/Workspace'
 
 type FileListProps = {
-  project: Project,
+  projName: string,
+  files: ProjectFile[],
+  openIdx: number,
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
   onClose: () => any,
@@ -26,30 +27,7 @@ type FileListProps = {
 }
 
 export const FileList: React.FC<FileListProps> = props => {
-  const [files, setFiles] = useState([] as ProjectFile[])
-  const openIdx: number = props.project.openIdx
-  const projName: string = props.project.name
-
-  useEffect(() => {
-    if (props.token === null) return
-
-    const url = new URL('http://localhost:8081/api/workspace')
-    const params = {workspaceId: props.project.workspaceId}
-    url.search = new URLSearchParams(params).toString()
-
-    //@ts-ignore URLs are perfectly valid arguments to fetch
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'x-access-token': props.token
-      }
-    })
-      .then(res => res.json())
-      .then(wkspResp => {
-        const workspace: Workspace = wkspResp.workspace
-        setFiles(workspace.files)
-      })
-  }, [])
+  const { files, openIdx, projName } = props
 
   const listHoverColor = useColorModeValue("gray.300", "gray.700")
   const fileListItems = files.map ((file, idx) => (

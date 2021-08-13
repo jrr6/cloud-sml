@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Divider,
@@ -11,6 +11,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
 import { AuthToken } from '../types/authTypes'
+import { Project, ProjectFile } from '../../../server/src/models/Project'
 
 type ProjectViewProps = { token: AuthToken }
 
@@ -18,21 +19,22 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   const { id } = useParams()
 
   // TODO: actually fetch the project
-  const project = {
-    workspaceId: 'daufdaf783-aof9393',
-    name: '5.2 - Datatypes & Polymorphism',
-    modificationDate: new Date(),
-    creationDate: new Date(),
-    openIdx: 1,
-    files: [
-      {name: "task2.sml", contents: "(* Functions are values! *)", active: false},
-      {name: "task3.sml", contents: "fun fact 0 = 1\n  | fact n = n * fact (n - 1)", active: true},
-      {name: "task4.sml", contents: "val () = print \"Hello, world!\"", active: true}
-    ]
-  }
-  const [openIdx, setOpenIdx] = React.useState(project.openIdx)
-  const [files, setFiles] = React.useState(project.files)
-  const [isSaved, setIsSaved] = React.useState(true)
+  // const project = {
+  //   workspaceId: 'daufdaf783-aof9393',
+  //   name: '5.2 - Datatypes & Polymorphism',
+  //   modificationDate: new Date(),
+  //   creationDate: new Date(),
+  //   openIdx: 1,
+  //   files: [
+  //     {name: "task2.sml", contents: "(* Functions are values! *)", active: false},
+  //     {name: "task3.sml", contents: "fun fact 0 = 1\n  | fact n = n * fact (n - 1)", active: true},
+  //     {name: "task4.sml", contents: "val () = print \"Hello, world!\"", active: true}
+  //   ]
+  // }
+  const [files, setFiles] = useState([] as ProjectFile[])
+  const [projName, setProjName] = useState('')
+  const [openIdx, setOpenIdx] = useState(0)
+  const [isSaved, setIsSaved] = useState(true)
 
   const history = useHistory()
 
@@ -56,13 +58,41 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     history.push("/dashboard")
   }
 
-  const newProject = {...project, files: files, openIdx: openIdx}
+  useEffect(() => {
+    if (token === null) return
+
+    const url = new URL('http://localhost:8081/api/project')
+    const params = {projectId: id}
+    url.search = new URLSearchParams(params).toString()
+
+    //@ts-ignore URLs are perfectly valid arguments to fetch
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-access-token': token
+      }
+    })
+      .then(res => res.json())
+      .then(projResp => {
+        const project: Project = projResp.project
+        setFiles(project.files)
+        setOpenIdx(project.openIdx)
+        setProjName(project.name)
+      })
+  }, [])
 
   return (
     <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
-        <FileList project={newProject} token={token} onOpen={onOpen} onToggle={onToggle} onClose={onClose} isSaved={isSaved} />
+        <FileList projName={projName}
+                  files={files}
+                  openIdx={openIdx}
+                  token={token}
+                  onOpen={onOpen}
+                  onToggle={onToggle}
+                  onClose={onClose}
+                  isSaved={isSaved} />
       </GridItem>
 
       {/* Editor */}
