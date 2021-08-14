@@ -7,7 +7,7 @@ import {
   Heading,
   HStack,
   Input,
-  Stack,
+  Stack, useColorModeValue,
   useRadio,
   useRadioGroup,
   UseRadioProps
@@ -19,6 +19,8 @@ const RadioCard = (props: UseRadioProps & {children: React.ReactNode, idx: numbe
   const { getInputProps, getCheckboxProps } = useRadio(props)
   const input = getInputProps()
   const checkbox = getCheckboxProps()
+  const backgroundColor = useColorModeValue('green.100', 'green.700')
+  const textColor = useColorModeValue('black', 'white')
   return (
     <Box as="label">
       <input {...input} />
@@ -31,12 +33,12 @@ const RadioCard = (props: UseRadioProps & {children: React.ReactNode, idx: numbe
         boxShadow="md"
         margin={0}
         _checked={{
-          bg: "green.100",
-          color: "black",
-          borderColor: "green.100",
+          bg: backgroundColor,
+          color: textColor,
+          borderColor: backgroundColor,
         }}
         px={5}
-        py={3}
+        py={1}
       >
         {props.children}
       </Box>
