@@ -25,7 +25,6 @@ export const registerCloneTemplateHandler = () => {
       openIdx: 0,
       files: templateToClone.files
     })
-    console.log(newProject)
     const newProjectId = (await newProject.save())._id
 
     const user = await UserModel.findOne({ _id: userId })

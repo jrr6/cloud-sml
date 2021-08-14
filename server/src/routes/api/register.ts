@@ -3,10 +3,15 @@ import { UserModel } from '../../models/User'
 import { hash } from 'bcrypt'
 import { SALT_ROUNDS } from '../../utils/authConfig'
 import { router } from '../../server'
+import { verifyJWT } from './isAuthenticated'
 
 export const registerRegisterHandler = () => {
-  router.post('/register', async (req, res) => {
-    // TODO: use JWT middleware to ensure only admin account can register new users
+  router.post('/register', verifyJWT, async (req, res) => {
+    if (req.user?.username !== 'admin') {
+      return res.status(401).json({
+        message: 'Not authorized to register users'
+      })
+    }
     const user: UserRegistration = req.body
     const isDuplicate = await UserModel.findOne({ username: user.username })
     if (isDuplicate) {

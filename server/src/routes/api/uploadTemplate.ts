@@ -1,10 +1,13 @@
 import { router } from '../../server'
 import { UploadTemplateRequest } from '../../types/serverTypes'
 import { ProjectTemplateModel } from '../../models/ProjectTemplate'
+import { verifyJWT } from './isAuthenticated'
 
 export const registerUploadTemplateHandler = () => {
-  // TODO: only admin should be able to use this endpoint
-  router.post('/uploadTemplate', async (req, res) => {
+  router.post('/uploadTemplate', verifyJWT, async (req, res) => {
+    if (req.user?.username !== 'admin') {
+      return res.status(401).json({ message: 'Not authorized to upload templates' })
+    }
     const { name, files } = req.body as UploadTemplateRequest
 
     const newTemplate = new ProjectTemplateModel({

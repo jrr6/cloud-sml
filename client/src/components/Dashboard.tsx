@@ -115,7 +115,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
           </Tr>
         </Thead>
         <Tbody>
-          {rowEls}
+          {rowEls.length > 0
+            ? rowEls
+            : <Tr><Td colSpan={2} textAlign='center' border='none'>No projects yet!</Td></Tr> }
         </Tbody>
       </Table>
 
