@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Flex, Grid, Heading } from '@chakra-ui/react'
 import { ColorModeSwitcher } from './ColorModeSwitcher'
 import { Redirect } from 'react-router-dom'
-import { RegistrationForm } from './admin/RegistrationForm'
+import { UserManagementForm } from './admin/UserManagementForm'
 import { TemplateUploader } from './admin/TemplateUploader'
 
 type AdminPanelProps = {
@@ -30,7 +30,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, loggedInUser }) =
       </Flex>
       <Grid templateColumns='repeat(2, 1fr)' gap={5}>
         <Box borderWidth={1} borderRadius={8} boxShadow="lg" padding={5}>
-          <RegistrationForm token={token} />
+          <UserManagementForm token={token} />
         </Box>
         <Box borderWidth={1} borderRadius={8} boxShadow="lg" padding={5}>
           <TemplateUploader token={token } />

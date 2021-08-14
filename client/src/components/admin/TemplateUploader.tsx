@@ -45,7 +45,7 @@ export const TemplateUploader: React.FC<TemplateUploaderProps> = ({ token }) => 
 
   return (
     <>
-      <Heading as='h3' size='lg' marginBottom={10}>Upload Template</Heading>
+      <Heading as='h3' size='lg' marginBottom={5}>Upload Template</Heading>
       <form onSubmit={uploadTemplate}>
         <Stack spacing={3}>
           <Input placeholder='template name' value={templateName} onChange={e => { setTemplateName(e.target.value) }} />
