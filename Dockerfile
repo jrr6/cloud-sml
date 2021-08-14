@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:latest
+FROM node:16
 ENV SML_VERSION=110.99
 ENV SML_CONFIG_FILENAME=config.tgz
 ENV SMLROOT=/usr/share/smlnj
 
 RUN apt-get update \
-    && apt-get install -y curl build-essential rlwrap \
+    && apt-get install -y rlwrap \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
