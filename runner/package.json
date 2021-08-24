@@ -1,0 +1,19 @@
+{
+  "name": "cloud-sml-runner",
+  "version": "0.1.0",
+  "main": "build/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-ws": "^5.0.2",
+    "node-pty": "^0.10.1"
+  },
+  "devDependencies": {
+    "@types/express-ws": "^3.0.1",
+    "@types/node": "^16.6.1"
+  }
+}

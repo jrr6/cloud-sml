@@ -17,4 +17,10 @@ RUN mkdir -p ${SMLROOT} \
     && config/install.sh -64
 
 COPY docker_config/smlnj /usr/bin/smlnj
-ENTRYPOINT [ "/bin/bash" ]
+
+WORKDIR /app
+COPY package.json /app/package.json
+RUN npm install
+# change above to --production, and also set ENV NODE_ENV=production
+COPY build/server.js /app/server.js
+CMD [ "node", "/app/server.js" ]
