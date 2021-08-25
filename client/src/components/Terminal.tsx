@@ -4,13 +4,14 @@ import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 import '../util/xterm.css'
 
-export const Terminal: React.FC = () => {
+type TerminalProps = { token: string, projectId: string }
+
+export const Terminal: React.FC<TerminalProps> = ({ token, projectId }) => {
   const terminalDivRef: React.RefObject<HTMLDivElement> = useRef(null)
   // Abuse refs because we don't want to deal with re-renders
   const terminalRef: React.RefObject<{terminal?: Xterm.Terminal}> = useRef({ terminal: undefined })
-  const showTerminalError = () => {}
+  const showTerminalError = () => { terminalRef.current!.terminal!.write('\n\n\x1b[31mCONNECTION LOST\n\n') }
 
-  // TODO: may run too early, causing terminalDivRef.current == null--consider useLayoutEffect or similar in that case
   useEffect(() => {
     const term = new Xterm.Terminal({
       windowsMode: false,
@@ -22,9 +23,19 @@ export const Terminal: React.FC = () => {
     term.open(terminalDivRef.current!)
     fitAddon.fit()
 
-    fetch('http://localhost:3001/spawn?cols=' + term.cols + '&rows=' + term.rows, {method: 'POST'}).then((res) => {
+    fetch('http://localhost:3001/run', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cols: term.cols,
+        rows: term.rows,
+        token,
+        projectId
+      })
+    }).then((res) => {
       res.json().then(({ pid }) => {
-        console.log('got pid ' + pid)
         const socket = new WebSocket(`ws://localhost:3001/terminals/${pid}`)
         socket.onclose = showTerminalError
         socket.onerror = showTerminalError

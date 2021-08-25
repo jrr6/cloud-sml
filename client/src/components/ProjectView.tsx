@@ -3,11 +3,10 @@ import { Box, Divider, Flex, Grid, GridItem, useColorModeValue } from '@chakra-u
 import { useHistory, useParams } from 'react-router-dom'
 import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
-import { AuthToken } from '../types/authTypes'
 import { Project, ProjectFile } from '../../../server/src/models/Project'
 import { Terminal } from './Terminal'
 
-type ProjectViewProps = { token: AuthToken }
+type ProjectViewProps = { token: string }
 export enum SaveState {
   Saved,
   Saving,
@@ -210,7 +209,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       {/* Terminal */}
       <GridItem colSpan={3}>
         {loaded &&
-        <Terminal />
+        <Terminal token={token} projectId={id} />
         }
       </GridItem>
     </Grid>
