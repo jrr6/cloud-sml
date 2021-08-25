@@ -1,10 +1,13 @@
 import express, { Express, Request } from 'express'
 import expressWs from 'express-ws'
 import { IPty, spawn } from 'node-pty'
+import cors from 'cors'
 
 const app: Express = express()
+app.use(cors()) // TODO: remove once all set up
 expressWs(app)
 
+// TODO: this info (along with who's using which terminal) should be accessible (and killable) from admin dashboard
 let terminals: {[key: number]: IPty} = {},
     logs: {[key: number]: string} = {}
 
@@ -17,6 +20,7 @@ const saveTerminal = (terminal: IPty) => {
   return terminal.pid
 }
 const fetchTerminal = (pid: number): IPty | undefined => terminals[pid]
+const fetchLogs = (pid: number): string => logs[pid]
 const updateTerminalSize = (pid: number, rows: number, cols: number) => {
   terminals[pid].resize(cols, rows)
 }
@@ -27,16 +31,16 @@ const removeTerminal = (pid: number) => {
   console.log('Closed terminal ' + pid.toString())
 }
 
-type TerminalSizeQuery = { cols?: number, rows?: number }
+type TerminalSizeQuery = { cols: string, rows: string }
 
 app.post('/spawn', (req, res) => {
-  const query: TerminalSizeQuery = req.query
+  const query: TerminalSizeQuery = req.query as TerminalSizeQuery
   const env = Object.assign({}, process.env)
   env['COLORTERM'] = 'truecolor'
-  const term = spawn('bash', [], {
-    name: 'xterm-256-color',
-    cols: query.cols || 80,
-    rows: query.rows || 24,
+  const term = spawn('smlnj', [], {
+    name: 'xterm-256color',
+    cols: parseInt(query.cols) || 80,
+    rows: parseInt(query.rows) || 24,
     cwd: env.PWD,
     //@ts-ignore this is directly from their sample code
     env: env,
@@ -54,8 +58,8 @@ app.post('/spawn', (req, res) => {
 app.post('/terminals/:pid/size', (req, res) => {
   try {
     const pid: number = parseInt(req.params.pid)
-    const query: TerminalSizeQuery = req.query
-    updateTerminalSize(pid, query.cols || 80, query.rows || 24)
+    const query: TerminalSizeQuery = req.query as TerminalSizeQuery
+    updateTerminalSize(pid, parseInt(query.cols) || 80, parseInt(query.rows) || 24)
   } catch {
     res.status(400).json({ message: 'Illegal query' })
   }
@@ -87,8 +91,11 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
     const term: IPty | undefined = fetchTerminal(pid)
     if (term === undefined) {
       // TODO: something
+      console.log('terminal connection failure')
       return
     }
+    console.log(`connected to terminal ${pid}`)
+    ws.send(fetchLogs(pid))
     term.onData((data: string) => {
       try {
         send(data)
@@ -109,4 +116,4 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
   }
 })
 
-app.listen(3001, () => { console.log('Runner listening on port 3031') })
+app.listen(3001, () => { console.log('Runner listening on port 3001') })

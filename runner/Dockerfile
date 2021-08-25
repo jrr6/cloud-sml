@@ -3,6 +3,7 @@ FROM node:16
 ENV SML_VERSION=110.99
 ENV SML_CONFIG_FILENAME=config.tgz
 ENV SMLROOT=/usr/share/smlnj
+ENV TERM=xterm-256color
 
 RUN apt-get update \
     && apt-get install -y rlwrap \

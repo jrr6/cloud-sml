@@ -5,6 +5,7 @@ import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
 import { AuthToken } from '../types/authTypes'
 import { Project, ProjectFile } from '../../../server/src/models/Project'
+import { Terminal } from './Terminal'
 
 type ProjectViewProps = { token: AuthToken }
 export enum SaveState {
@@ -169,6 +170,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       }
     })
       .then(res => res.json())
+      // TODO: fail gracefully (i.e., redirect to login) if token is invalid
       .then(projResp => {
         const project: Project = projResp.project
         setFiles(project.files)
@@ -208,7 +210,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       {/* Terminal */}
       <GridItem colSpan={3}>
         {loaded &&
-        <p>This is where the terminal goes</p>
+        <Terminal />
         }
       </GridItem>
     </Grid>
