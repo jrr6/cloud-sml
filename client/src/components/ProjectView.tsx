@@ -24,6 +24,8 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   const [saveState, setSaveState] = useState(SaveState.Saved)
   const [loaded, setLoaded] = useState(false)
   const [pendingSave, setPendingSave] = useState(null as number | null)
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false)
+  const [lastRun, setLastRun] = useState(null as Date | null)
   const activeFileContents = useRef<string>()
 
   const history = useHistory()
@@ -47,7 +49,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     })
 
     return () => {
-      unblock();
+      unblock()
       window.removeEventListener('beforeunload', interceptor, false)
     }
   }, [])
@@ -124,6 +126,11 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     }
   }
 
+  const onRun = () => {
+    setIsTerminalOpen(true)
+    setLastRun(new Date())
+  }
+
   const performSave = () => new Promise((res, rej) => {
     if (token == null) return rej()
     fetch('http://localhost:8081/api/saveFile', {
@@ -191,12 +198,13 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
                   onOpen={onOpen}
                   onToggle={onToggle}
                   onClose={onClose}
+                  onRun={onRun}
                   saveState={saveState} />
         }
       </GridItem>
 
       {/* Editor */}
-      <GridItem colSpan={5}>
+      <GridItem colSpan={isTerminalOpen ? 5 : 8} overflow='hidden'>
         <Flex>
           <Box><Divider orientation="vertical"/></Box>
           {loaded &&
@@ -207,11 +215,13 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       </GridItem>
 
       {/* Terminal */}
+      {loaded && isTerminalOpen &&
       <GridItem colSpan={3}>
-        {loaded &&
-        <Terminal token={token} projectId={id} />
-        }
-      </GridItem>
+        <Terminal token={token}
+                  projectId={id}
+                  lastRun={lastRun}
+                  onClose={() => setIsTerminalOpen(false)} />
+      </GridItem>}
     </Grid>
   )
 }

@@ -23,6 +23,7 @@ type FileListProps = {
   onToggle: (fileIdx: number) => any,
   onOpen: (fileIdx: number) => any,
   onClose: () => any,
+  onRun: () => any,
   saveState: SaveState,
   token: AuthToken
 }
@@ -68,7 +69,7 @@ export const FileList: React.FC<FileListProps> = props => {
             {statusText}
           </Badge>
         </Box>
-        <Button leftIcon={<IoMdPlay color="green" />}>Run</Button>
+        <Button leftIcon={<IoMdPlay color="green" />} onClick={props.onRun}>Run</Button>
       </Flex>
       <Heading as="h3" size="md" marginTop={4}>{projName}</Heading>
       <List marginTop={2} spacing={1} w="100%">

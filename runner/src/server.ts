@@ -30,12 +30,14 @@ const saveTerminal = (terminal: IPty) => {
   return terminal.pid
 }
 const fetchTerminal = (pid: number): IPty | undefined => terminals[pid]
+const killTerminal = (pid: number): void => terminals[pid]?.kill() // terminal may already have been killed by user
 const fetchLogs = (pid: number): string => logs[pid]
 const updateTerminalSize = (pid: number, rows: number, cols: number) => {
   terminals[pid].resize(cols, rows)
 }
+// Removes a previously active terminal
+// Do not call directly -- instead trigger by killing the appropriate terminal
 const removeTerminal = (pid: number) => {
-  terminals[pid].kill()
   delete terminals[pid]
   delete logs[pid]
   console.log('Closed terminal ' + pid.toString())
@@ -102,6 +104,7 @@ app.post('/run', async (req, res) => {
     term.onExit(() => {
       // Delete run container on exit
       fs.rmSync(dirpath, { recursive: true, force: true })
+      removeTerminal(pid)
     })
     const pid = saveTerminal(term)
     console.log('Created terminal with PID ' + pid.toString())
@@ -170,7 +173,7 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
     })
     //@ts-ignore figure out what type ws actually is
     ws.on('close', () => {
-      removeTerminal(pid)
+      killTerminal(pid)
     })
   } catch {
     // TODO: something

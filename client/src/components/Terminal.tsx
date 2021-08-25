@@ -1,16 +1,19 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as Xterm from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 import '../util/xterm.css'
+import { CloseButton } from '@chakra-ui/react'
 
-type TerminalProps = { token: string, projectId: string }
+type TerminalProps = { token: string, projectId: string, lastRun: Date | null, onClose: () => void }
 
-export const Terminal: React.FC<TerminalProps> = ({ token, projectId }) => {
+export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, onClose }) => {
   const terminalDivRef: React.RefObject<HTMLDivElement> = useRef(null)
   // Abuse refs because we don't want to deal with re-renders
-  const terminalRef: React.RefObject<{terminal?: Xterm.Terminal}> = useRef({ terminal: undefined })
-  const showTerminalError = () => { terminalRef.current!.terminal!.write('\n\n\x1b[31mCONNECTION LOST\n\n') }
+  const terminalRef = useRef<Xterm.Terminal | null>(null)
+  const socketRef = useRef<WebSocket | null>(null)
+  const showTerminalError = () => { terminalRef.current!.write('\n\n\x1b[31mCONNECTION LOST\n\n') }
+  const [showCloseButton, setShowCloseButton] = useState(false)
 
   useEffect(() => {
     const term = new Xterm.Terminal({
@@ -34,22 +37,38 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId }) => {
         token,
         projectId
       })
-    }).then((res) => {
-      res.json().then(({ pid }) => {
+    }).then(res => res.json())
+      .then(({ pid }) => {
         const socket = new WebSocket(`ws://localhost:3001/terminals/${pid}`)
         socket.onclose = showTerminalError
         socket.onerror = showTerminalError
-        socket.onopen = () => { console.log('socket connected'); term.loadAddon(new AttachAddon(socket)) }
+        socket.onopen = () => {
+          console.log('socket connected')
+          term.loadAddon(new AttachAddon(socket))
+        }
+        socketRef.current = socket
       })
-    })
-    terminalRef.current!.terminal = term
+    terminalRef.current = term
     return () => {
-      terminalRef.current!.terminal!.dispose()
+      if (socketRef.current !== null) {
+        // Deregister error text function, since we're the ones closing, not (unexpectedly) the server
+        socketRef.current.onclose = null
+        socketRef.current.close()
+      }
+      terminalRef.current?.dispose()
     }
-  }, [])
-
+  }, [lastRun])
 
   return (
-    <div ref={terminalDivRef} style={{width: '100%', height: '100%'}} />
+    <>
+      <CloseButton size='lg'
+                   position='fixed'
+                   right={4} top={4} zIndex={10}
+                   opacity={showCloseButton ? '100' : '0'}
+                   onMouseEnter={() => setShowCloseButton(true)}
+                   onMouseLeave={() => setShowCloseButton(false)}
+                   onClick={() => onClose()} />
+      <div ref={terminalDivRef} style={{width: '100%', height: '100%'}} />
+    </>
   )
 }
