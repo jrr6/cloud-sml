@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as Xterm from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
-import '../util/xterm.css'
-import { CloseButton } from '@chakra-ui/react'
+import '../styles/xterm.css'
+import '../styles/xterm-tweaks.css'
+import { CloseButton, useColorModeValue } from '@chakra-ui/react'
+import { CODE_FONTS } from '../util/Fonts'
 
 type TerminalProps = { token: string, projectId: string, lastRun: Date | null, onClose: () => void }
 
@@ -15,10 +17,25 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   const showTerminalError = () => { terminalRef.current!.write('\n\n\x1b[31mCONNECTION LOST\n\n') }
   const [showCloseButton, setShowCloseButton] = useState(false)
 
+  const lightTheme = {
+    background: '#fff',
+    cursor: '#000',
+    foreground: '#000'
+  }
+  const darkTheme = {
+    background: '#000',
+    cursor: '#fff',
+    foreground: '#fff'
+  }
+
+  const theme = useColorModeValue(lightTheme, darkTheme)
+
   useEffect(() => {
     const term = new Xterm.Terminal({
       windowsMode: false,
-      fontFamily: 'Fira Code, SF Mono, monospace'
+      fontFamily: CODE_FONTS,
+      fontSize: 14,
+      theme
     } as Xterm.ITerminalOptions)
 
     const fitAddon = new FitAddon()

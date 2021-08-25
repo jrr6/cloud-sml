@@ -10,6 +10,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { useAuthToken } from './hooks/useAuthToken'
 import { PrivateRoute } from './components/PrivateRoute'
 import { AdminPanel } from './components/AdminPanel'
+import 'firacode'
 
 export const App = () => {
   const { auth, setAuth } = useAuthToken()

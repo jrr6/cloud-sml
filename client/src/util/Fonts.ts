@@ -1,0 +1,1 @@
+export const CODE_FONTS = 'Fira Code, SF Mono, Andale Mono, Menlo, monospace'

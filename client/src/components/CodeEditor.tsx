@@ -3,6 +3,7 @@ import Editor from "@monaco-editor/react"
 import { language } from "../monaco-config/sml-language"
 import { useColorMode, useColorModeValue } from '@chakra-ui/react'
 import { ProjectFile } from '../../../server/src/models/Project'
+import { CODE_FONTS } from '../util/Fonts'
 
 type CodeEditorProps = {
   file: ProjectFile,
@@ -28,7 +29,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
       path={name}
       defaultLanguage="sml"
       defaultValue={contents}
-      options={{tabSize: 2}}
+      options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14}}
       onMount={(editor, monaco) => {
         // Add SML language support
         monaco.languages.register({ id: "sml" })

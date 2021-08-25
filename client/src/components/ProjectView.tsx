@@ -30,6 +30,12 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   const history = useHistory()
 
+  // Prevent ugly semi-scrolling caused by various hidden elements
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = 'visible' }
+  }, [])
+
   useEffect(() => {
     const confirmation = 'You have unsaved changes, which will be lost if you continue. Are you sure you want to exit?'
     const interceptor = (e: Event) => {
@@ -187,7 +193,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   }, [])
 
   return (
-    <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0}>
+    <Grid templateColumns="repeat(10, 1fr)" w="100%" gap={0} overflow='hidden'>
       {/* File List */}
       <GridItem colSpan={2} p={5} background={useColorModeValue("gray.200", "default")}>
         {loaded &&
@@ -204,7 +210,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       </GridItem>
 
       {/* Editor */}
-      <GridItem colSpan={isTerminalOpen ? 5 : 8} overflow='hidden'>
+      <GridItem colSpan={isTerminalOpen ? 5 : 8}>
         <Flex>
           <Box><Divider orientation="vertical"/></Box>
           {loaded &&
