@@ -34,6 +34,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
   const passwordModalDisclosure = useDisclosure()
 
   const [projects, setProjects] = useState([] as Project[])
+  const [needsRefresh, setNeedsRefresh] = useState(true)
 
   const history = useHistory()
   const logOut = () => {
@@ -47,7 +48,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
   }
 
   useEffect(() => {
-    if (token === null) return
+    if (token === null || !needsRefresh) return
 
     fetch('http://localhost:8081/api/userProjects', {
       method: 'GET',
@@ -65,10 +66,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
           modificationDate: new Date(proj.modificationDate)
         })))
       })
-  }, [])
+    setNeedsRefresh(false)
+  }, [needsRefresh])
+
+  // After cloning a new project, need to refresh project list
+  const onClone = () => setNeedsRefresh(true)
 
   const rowHoverColor = useColorModeValue("gray.200", "gray.700")
-  const rowEls = projects.map((proj: Project) => (
+  const rowEls = projects
+    .sort((a: Project, b: Project) =>
+      // Sort by most recently edited
+      a.modificationDate < b.modificationDate ? 1
+        : a.modificationDate > b.modificationDate ? -1
+        : 0
+    )
+    .map((proj: Project) => (
     <Tr cursor="pointer" _hover={{background: rowHoverColor}}
         key={proj._id} id={proj._id}
         onClick={() => openProject(proj._id)}>
@@ -123,7 +135,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
 
       <NewProjectModal isOpen={newModalDisclosure.isOpen}
                        onClose={newModalDisclosure.onClose}
-                       token={token} />
+                       token={token}
+                       onClone={onClone} />
       <DownloadModal isOpen={dlModalDisclosure.isOpen}
                      onClose={dlModalDisclosure.onClose}
                      token={token} />
@@ -131,7 +144,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
                            onClose={passwordModalDisclosure.onClose}
                            token={token}
                            clearToken={clearToken} />
-
     </Box>
   )
 }

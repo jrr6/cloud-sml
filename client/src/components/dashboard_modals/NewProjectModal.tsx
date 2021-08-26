@@ -15,7 +15,8 @@ import { DashModalProps } from '../../types/modalTypes'
 import { ProjectTemplate } from '../../../../server/src/models/ProjectTemplate'
 import { AuthToken } from '../../types/authTypes'
 
-export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken}> = ({ isOpen, onClose, token }) => {
+export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken, onClone: () => void}> =
+  ({ isOpen, onClose, token, onClone }) => {
   const [templates, setTemplates] = useState([] as ProjectTemplate[])
   // Fetch templates anew each time we open the modal (hence isOpen dep)
   useEffect(() => {
@@ -30,6 +31,24 @@ export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken}> = ({
         .then(resBody => setTemplates(resBody.templates))
     }
   }, [isOpen])
+
+  const cloneTemplate = (templateId: string) => {
+    fetch('http://localhost:8081/api/cloneTemplate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token!
+      },
+      body: JSON.stringify({
+        templateId
+      })
+    }).then(res => {
+       if (res.ok) {
+         onClone()
+         onClose()
+       }
+    })
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -46,7 +65,9 @@ export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken}> = ({
                   {templates.map(({ _id, name }) => (
                     <Tr key={_id}>
                       <Td>{name}</Td>
-                      <Td><Button colorScheme="blue" leftIcon={<IoMdDownload />}>Add</Button></Td>
+                      <Td><Button colorScheme="blue"
+                                  leftIcon={<IoMdDownload />}
+                                  onClick={() => cloneTemplate(_id)}>Add</Button></Td>
                     </Tr>
                   ))}
                 </Tbody>
