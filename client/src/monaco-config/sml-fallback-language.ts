@@ -1,7 +1,6 @@
-// a potentially simpler solution: https://github.com/bolinfest/monaco-tm
 // some useful discussion: https://github.com/react-monaco-editor/react-monaco-editor/issues/136
 
-export const language = {
+export const fallbackLanguage = {
   keywords: [
     'EQUAL', 'GREATER', 'LESS', 'NONE', 'SOME', 'abstraction', 'abstype', 'and', 'andalso', 'array', 'as', 'before', 'bool', 'case', 'char', 'datatype', 'do', 'else', 'end', 'eqtype', 'exception', 'exn', 'false', 'fn', 'fun', 'functor', 'handle', 'if', 'in', 'include', 'infix', 'infixr', 'int', 'let', 'list', 'local', 'nil', 'nonfix', 'not', 'o', 'of', 'op', 'open', 'option', 'orelse', 'overload', 'print', 'raise', 'real', 'rec', 'ref', 'sharing', 'sig', 'signature', 'string', 'struct', 'structure', 'substring', 'then', 'true', 'type', 'unit', 'val', 'vector', 'where', 'while', 'with', 'withtype', 'word'
   ],

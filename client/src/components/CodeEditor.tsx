@@ -1,9 +1,16 @@
 import React from "react"
 import Editor from "@monaco-editor/react"
-import { language } from "../monaco-config/sml-language"
+import { fallbackLanguage } from "../monaco-config/sml-fallback-language"
 import { useColorMode, useColorModeValue } from '@chakra-ui/react'
 import { ProjectFile } from '../../../server/src/models/Project'
 import { CODE_FONTS } from '../util/Fonts'
+import { wasmSupported } from '../util/wasmUtil'
+import { loadWASM } from 'onigasm'
+import { Registry } from 'monaco-textmate'
+import { wireTmGrammars } from 'monaco-editor-textmate'
+import smlGrammar from '../monaco-config/sml.tmLanguage.json'
+import darkTheme from '../monaco-config/theme-dark.json'
+import lightTheme from '../monaco-config/theme-light.json'
 
 type CodeEditorProps = {
   file: ProjectFile,
@@ -21,6 +28,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
     return (<></>)
   }
 
+  const useWasm = wasmSupported()
+
   return (
     <>
     <ColorChangerDummy refresh={colorChanger} />
@@ -30,22 +39,54 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
       defaultLanguage="sml"
       defaultValue={contents}
       options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14}}
-      onMount={(editor, monaco) => {
-        // Add SML language support
-        monaco.languages.register({ id: "sml" })
-        // language IS IMonarchLanguage, I just can't figure out how to import the types...
-        // @ts-ignore
-        monaco.languages.setMonarchTokensProvider("sml", language)
+      beforeMount={monaco => {
+        // Add SML as a language that VS Code recognizes support
+        monaco.languages.register({id: "sml"})
 
+        if (useWasm) {
+          //@ts-ignore apparently TS doesn't like JSON
+          monaco.editor.defineTheme('sml-cloud-dark', darkTheme)
+          //@ts-ignore apparently TS doesn't like JSON
+          monaco.editor.defineTheme('sml-cloud-light', lightTheme)
+        } else {
+          // language IS IMonarchLanguage, I just can't figure out how to import the types...
+          // @ts-ignore
+          monaco.languages.setMonarchTokensProvider("sml", fallbackLanguage)
+        }
+      }}
+      onMount={(editor, monaco) => {
         // Add ability to toggle dark/light appearance
         editor.addAction({
           id: "change-appearance",
           label: "Change Color Theme",
-          run: () => { setColorChanger(true) }
+          run: () => {
+            setColorChanger(true)
+          }
         })
+
+        if (useWasm) {
+          loadWASM('http://localhost:8081/resources/onigasm.wasm')
+            .then(() => {
+              const registry = new Registry({
+                getGrammarDefinition: async (scopeName: string) => {
+                  // scopeName === source.ml, since there's only one
+                  return {
+                    format: 'json',
+                    content: smlGrammar
+                  }
+                }
+              })
+
+              const grammars = new Map()
+              grammars.set('sml', 'source.ml')
+
+              const _ = wireTmGrammars(monaco, registry, grammars, editor)
+            })
+        }
       }}
       onChange={(newContents, _) => onEdit(newContents || "")}
-      theme={useColorModeValue("vs", "vs-dark")}
+      // TODO: use fallback vs themes if no wasm
+      theme={useColorModeValue(useWasm ? 'sml-cloud-light' : 'vs', useWasm ? 'sml-cloud-dark' : 'vs-dark')}
     />
     </>
   )

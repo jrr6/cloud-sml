@@ -51,8 +51,13 @@ registerToggleFileHandler()
 registerLookupProjectsHandler()
 
 app.use('/api', router)
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+// TODO: figure out what's wrong with the following:
+// app.use('/resources', express.static(__dirname + '../resources'))
+app.get('/resources/onigasm.wasm', (req, res) => {
+  res.sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/server/resources/onigasm.wasm')
 })
+// app.get('*', (req, res) => {
+//   res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+// })
 
 app.listen(8081, () => console.log('Server is running on http://localhost:8081/'))
