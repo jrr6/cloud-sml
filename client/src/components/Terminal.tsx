@@ -4,7 +4,7 @@ import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 import '../styles/xterm.css'
 import '../styles/xterm-tweaks.css'
-import { Box, CloseButton, useColorModeValue } from '@chakra-ui/react'
+import { Box, CloseButton, useColorMode, useColorModeValue } from '@chakra-ui/react'
 import { CODE_FONTS } from '../util/Fonts'
 
 type TerminalProps = { token: string, projectId: string, lastRun: Date | null, onClose: () => void }
@@ -16,6 +16,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   const socketRef = useRef<WebSocket | null>(null)
   const showTerminalError = () => { terminalRef.current!.write('\r\n\n\x1b[31;1mTerminal disconnected\x1b[0m\r\n\n') }
   const [showCloseButton, setShowCloseButton] = useState(false)
+  const { colorMode } = useColorMode()
 
   const lightTheme = {
     background: '#fff',
@@ -34,8 +35,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
     const term = new Xterm.Terminal({
       windowsMode: false,
       fontFamily: CODE_FONTS,
-      fontSize: 14,
-      theme
+      fontSize: 14
     } as Xterm.ITerminalOptions)
 
     const fitAddon = new FitAddon()
@@ -75,6 +75,10 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
       terminalRef.current?.dispose()
     }
   }, [lastRun])
+
+  useEffect(() => {
+    terminalRef.current?.setOption('theme', theme)
+  }, [colorMode])
 
   return (
     <Box onMouseEnter={() => setShowCloseButton(true)}
