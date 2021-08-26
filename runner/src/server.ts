@@ -30,6 +30,8 @@ type TerminalEntry = { ipty: IPty, processId: string, dir: string }
 let terminals: {[key: number]: TerminalEntry} = {},
     logs: {[key: number]: string} = {}
 
+const TERMINAL_KILL_TIMEOUT_MS = 3000
+
 const saveTerminal = (terminal: IPty, processId: string, dir: string) => {
   terminals[terminal.pid] = {
     ipty: terminal,
@@ -43,7 +45,12 @@ const saveTerminal = (terminal: IPty, processId: string, dir: string) => {
   return terminal.pid
 }
 const fetchTerminal = (pid: number): IPty | undefined => terminals[pid]?.ipty
-const killTerminal = (pid: number): void => terminals[pid]?.ipty.kill() // terminal may already have been killed by user
+const killTerminal = (pid: number): void => {
+  // The terminal may already have been killed by user, so use optional chaining
+  terminals[pid]?.ipty.kill('SIGTERM')
+  // It gets a window to try to gracefully exit (and save rlwrap history); otherwise, we force-kill
+  setTimeout(() => terminals[pid]?.ipty.kill(), TERMINAL_KILL_TIMEOUT_MS)
+}
 const fetchLogs = (pid: number): string => logs[pid]
 const updateTerminalSize = (pid: number, rows: number, cols: number) => {
   terminals[pid].ipty.resize(cols, rows)
@@ -214,6 +221,8 @@ app.ws('/terminals/:pid', async (ws: WebSocket, req: Request) => {
     }
   }
 
+  const generateErrorText = (text: string) => `\r\n\x1b[1;37;41m${text}\x1b[0m\r\n`
+
   try {
     const pid = parseInt(req.params.pid)
     const send = buffer(ws, 5)
@@ -221,7 +230,7 @@ app.ws('/terminals/:pid', async (ws: WebSocket, req: Request) => {
 
     if (term === undefined) {
       // Requested terminal doesn't exist
-      ws.send('\x1b[31mTerminal connection failure\x1b[0m\n')
+      ws.send(generateErrorText('Terminal connection failure'))
       console.log('Terminal connection failure for pid ' + pid)
       return
     }
@@ -232,6 +241,7 @@ app.ws('/terminals/:pid', async (ws: WebSocket, req: Request) => {
         send(data)
       } catch { /* ignore */ }
     })
+    term.onExit(() => ws.close())
     //@ts-ignore figure out what type ws actually is
     ws.on('message', (msg: string) => {
       term.write(msg)
@@ -241,7 +251,7 @@ app.ws('/terminals/:pid', async (ws: WebSocket, req: Request) => {
       killTerminal(pid)
     })
   } catch {
-    ws.send('\x1b[31mUnknown terminal failure\x1b[0m\n')
+    ws.send(generateErrorText('Unknown terminal failure'))
     console.log('Unknown terminal error for pid ' + req.params.pid)
     try {
       const pid = parseInt(req.params.pid)

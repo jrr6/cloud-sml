@@ -4,7 +4,7 @@ import { FitAddon } from 'xterm-addon-fit'
 import { AttachAddon } from 'xterm-addon-attach'
 import '../styles/xterm.css'
 import '../styles/xterm-tweaks.css'
-import { CloseButton, useColorModeValue } from '@chakra-ui/react'
+import { Box, CloseButton, useColorModeValue } from '@chakra-ui/react'
 import { CODE_FONTS } from '../util/Fonts'
 
 type TerminalProps = { token: string, projectId: string, lastRun: Date | null, onClose: () => void }
@@ -14,7 +14,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   // Abuse refs because we don't want to deal with re-renders
   const terminalRef = useRef<Xterm.Terminal | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
-  const showTerminalError = () => { terminalRef.current!.write('\n\n\x1b[31mCONNECTION LOST\x1b[0m\n\n') }
+  const showTerminalError = () => { terminalRef.current!.write('\r\n\n\x1b[31;1mTerminal disconnected\x1b[0m\r\n\n') }
   const [showCloseButton, setShowCloseButton] = useState(false)
 
   const lightTheme = {
@@ -77,15 +77,15 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   }, [lastRun])
 
   return (
-    <>
+    <Box onMouseEnter={() => setShowCloseButton(true)}
+         onMouseLeave={() => setShowCloseButton(false)}
+         style={{width: '100%', height: '100%'}}>
       <CloseButton size='lg'
                    position='fixed'
                    right={4} top={4} zIndex={10}
                    opacity={showCloseButton ? '100' : '0'}
-                   onMouseEnter={() => setShowCloseButton(true)}
-                   onMouseLeave={() => setShowCloseButton(false)}
                    onClick={() => onClose()} />
       <div ref={terminalDivRef} style={{width: '100%', height: '100%'}} />
-    </>
+    </Box>
   )
 }

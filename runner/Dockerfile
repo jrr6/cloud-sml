@@ -20,6 +20,7 @@ RUN mkdir -p ${SMLROOT} \
 COPY docker_config/smlnj /usr/bin/smlnj
 
 RUN mkdir /runs
+RUN mkdir /histories
 
 WORKDIR /app
 COPY package.json /app/package.json

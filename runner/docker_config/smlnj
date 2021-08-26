@@ -2,4 +2,4 @@
 exec \
   env PRINT_DEPTH=${PRINT_DEPTH:-10} \
   env COMPILER_MC_WARN_NON_EXHAUSTIVE_BIND=${COMPILER_MC_WARN_NON_EXHAUSTIVE_BIND:-false} \
-  /usr/bin/rlwrap /usr/share/smlnj/bin/sml "$@"
+  /usr/bin/rlwrap --history-file="/histories/${CLOUDSML_PROJECT_ID}" /usr/share/smlnj/bin/sml "$@"
