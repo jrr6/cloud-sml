@@ -6,6 +6,8 @@ import cors from 'cors'
 import fetch from 'node-fetch'
 import { Project } from '../../server/src/models/Project'
 import * as fs from 'fs'
+import { AuthQuery, TerminalSizeQuery, TerminalStats, TerminalStatsResponse } from './types/RunnerTypes'
+import { JWTResponse } from '../../server/src/types/serverTypes'
 
 const app: Express = express()
 app.use(
@@ -17,23 +19,29 @@ app.use(json())
 app.use(cors()) // TODO: remove once all set up
 expressWs(app)
 
+type TerminalEntry = { ipty: IPty, processId: string, dir: string }
+
 // TODO: this info (along with who's using which terminal) should be accessible (and killable) from admin dashboard
-let terminals: {[key: number]: IPty} = {},
+let terminals: {[key: number]: TerminalEntry} = {},
     logs: {[key: number]: string} = {}
 
-const saveTerminal = (terminal: IPty) => {
-  terminals[terminal.pid] = terminal
+const saveTerminal = (terminal: IPty, processId: string, dir: string) => {
+  terminals[terminal.pid] = {
+    ipty: terminal,
+    processId,
+    dir
+  }
   logs[terminal.pid] = ''
   terminal.onData((data: string) => {
     logs[terminal.pid] += data
   })
   return terminal.pid
 }
-const fetchTerminal = (pid: number): IPty | undefined => terminals[pid]
-const killTerminal = (pid: number): void => terminals[pid]?.kill() // terminal may already have been killed by user
+const fetchTerminal = (pid: number): IPty | undefined => terminals[pid].ipty
+const killTerminal = (pid: number): void => terminals[pid]?.ipty.kill() // terminal may already have been killed by user
 const fetchLogs = (pid: number): string => logs[pid]
 const updateTerminalSize = (pid: number, rows: number, cols: number) => {
-  terminals[pid].resize(cols, rows)
+  terminals[pid].ipty.resize(cols, rows)
 }
 // Removes a previously active terminal
 // Do not call directly -- instead trigger by killing the appropriate terminal
@@ -42,9 +50,6 @@ const removeTerminal = (pid: number) => {
   delete logs[pid]
   console.log('Closed terminal ' + pid.toString())
 }
-
-type TerminalSizeQuery = { cols: string, rows: string }
-type AuthQuery = { token: string, projectId: string }
 
 const RUNS_PATH_PREFIX = '/runs'
 
@@ -58,6 +63,52 @@ const generateDirname = (projectId: string): string => {
     return candidate
   }
 }
+
+const verifyAdmin = async (token: string) => {
+  const resp = await fetch('http://host.docker.internal:8081/api/isAuthenticated', {
+    method: 'GET',
+    headers: {
+      'x-access-token': token
+    }
+  })
+  const json: JWTResponse = await resp.json()
+  return json?.username === 'admin'
+}
+
+app.get('/stats', async (req, res) => {
+  try {
+    const isAdmin = await verifyAdmin(req.headers['x-access-token'] as string)
+    if (isAdmin) {
+      const terminalStats: TerminalStats[] = Object.keys(terminals).map(pidStr => {
+        const pid = parseInt(pidStr)
+        const entry = terminals[pid]
+        return {
+          pid,
+          projectId: entry.processId,
+          dir: entry.dir
+        }
+      })
+      return res.status(200).json({
+        message: 'Success',
+        terminals: terminalStats
+      } as TerminalStatsResponse)
+    } else {
+      return res.status(401).json({ message: 'Not authorized to view stats' })
+    }
+  } catch {
+    return res.status(500).json({ message: 'Error gathering stats' })
+  }
+})
+
+app.post('/kill/:pid', async (req, res) => {
+  const isAdmin = await verifyAdmin(req.headers['x-access-token'] as string)
+  if (isAdmin) {
+    killTerminal(parseInt(req.params.pid))
+    res.status(200).json({ message: 'Success' })
+  } else {
+    res.status(401).json({ message: 'Not authorized to kill terminals' })
+  }
+})
 
 app.post('/run', async (req, res) => {
   const { cols, rows, token, projectId } = req.body as TerminalSizeQuery & AuthQuery
@@ -92,6 +143,7 @@ app.post('/run', async (req, res) => {
     const env = Object.assign({}, process.env)
     env.PWD = dirpath
     env['COLORTERM'] = 'truecolor'
+    env['CLOUDSML_PROJECT_ID'] = projectId
     const term = spawn('smlnj', filenames, {
       name: 'xterm-256color',
       cols: parseInt(cols) || 80,
@@ -106,7 +158,7 @@ app.post('/run', async (req, res) => {
       fs.rmSync(dirpath, { recursive: true, force: true })
       removeTerminal(pid)
     })
-    const pid = saveTerminal(term)
+    const pid = saveTerminal(term, projectId, env.PWD)
     console.log('Created terminal with PID ' + pid.toString())
     res.status(200).json({
       message: 'Success',

@@ -4,6 +4,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher'
 import { Redirect } from 'react-router-dom'
 import { UserManagementForm } from './admin/UserManagementForm'
 import { TemplateUploader } from './admin/TemplateUploader'
+import { TerminalManager } from './admin/TerminalManager'
 
 type AdminPanelProps = {
   token: string,
@@ -33,7 +34,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, loggedInUser }) =
           <UserManagementForm token={token} />
         </Box>
         <Box borderWidth={1} borderRadius={8} boxShadow="lg" padding={5}>
-          <TemplateUploader token={token } />
+          <TemplateUploader token={token} />
+        </Box>
+        <Box gridColumn='1/3' borderWidth={1} borderRadius={8} boxShadow="lg" padding={5}>
+          <TerminalManager token={token} />
         </Box>
       </Grid>
     </Box>

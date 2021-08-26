@@ -23,3 +23,6 @@ export type SaveFileResponse = { message: string }
 export type SetOpenFileRequest = { projectId: string, fileIdx: number }
 export type SetOpenFileResponse = { message: string }
 export type ToggleFileRequest = { projectId: string, fileIdx: number, active: boolean }
+export type LookupProjectsRequest = { projectIds: string[] }
+export type LookupProjectsMetadata = Omit<Omit<Project, 'files'>, 'openIdx'> & {ownerName: string}
+export type LookupProjectsResponse = { message: string, projectDescriptions: LookupProjectsMetadata[] }
