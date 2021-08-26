@@ -3,6 +3,7 @@ import { promisify } from '../../utils/fnUtils'
 import { verify } from 'jsonwebtoken'
 import { JWT_SIGNING_KEY } from '../../utils/authConfig'
 import { router } from '../../server'
+import { JWTResponse } from '../../types/serverTypes'
 
 export const verifyJWT: RequestHandler = (req, res, next) => {
   const tokenHeader = req.headers['x-access-token'] as string | undefined
@@ -26,7 +27,11 @@ export const verifyJWT: RequestHandler = (req, res, next) => {
 
 export const registerIsAuthenticatedHandler = () => {
   router.get('/isAuthenticated', verifyJWT, (req, res) => {
-    res.status(200).json({ message: 'Logged in', isLoggedIn: true, username: req.user!.username })
+    res.status(200).json({
+      message: 'Logged in',
+      isLoggedIn: true,
+      username: req.user!.username
+    } as JWTResponse)
   })
 }
 

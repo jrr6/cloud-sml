@@ -6,7 +6,13 @@ import cors from 'cors'
 import fetch from 'node-fetch'
 import { Project } from '../../server/src/models/Project'
 import * as fs from 'fs'
-import { AuthQuery, TerminalSizeQuery, TerminalStats, TerminalStatsResponse } from './types/RunnerTypes'
+import {
+  KillTerminalRequest,
+  ProjectQuery,
+  TerminalSizeQuery,
+  TerminalStats,
+  TerminalStatsResponse
+} from './types/RunnerTypes'
 import { JWTResponse } from '../../server/src/types/serverTypes'
 
 const app: Express = express()
@@ -21,7 +27,6 @@ expressWs(app)
 
 type TerminalEntry = { ipty: IPty, processId: string, dir: string }
 
-// TODO: this info (along with who's using which terminal) should be accessible (and killable) from admin dashboard
 let terminals: {[key: number]: TerminalEntry} = {},
     logs: {[key: number]: string} = {}
 
@@ -29,7 +34,7 @@ const saveTerminal = (terminal: IPty, processId: string, dir: string) => {
   terminals[terminal.pid] = {
     ipty: terminal,
     processId,
-    dir
+    dir,
   }
   logs[terminal.pid] = ''
   terminal.onData((data: string) => {
@@ -37,7 +42,7 @@ const saveTerminal = (terminal: IPty, processId: string, dir: string) => {
   })
   return terminal.pid
 }
-const fetchTerminal = (pid: number): IPty | undefined => terminals[pid].ipty
+const fetchTerminal = (pid: number): IPty | undefined => terminals[pid]?.ipty
 const killTerminal = (pid: number): void => terminals[pid]?.ipty.kill() // terminal may already have been killed by user
 const fetchLogs = (pid: number): string => logs[pid]
 const updateTerminalSize = (pid: number, rows: number, cols: number) => {
@@ -64,14 +69,18 @@ const generateDirname = (projectId: string): string => {
   }
 }
 
-const verifyAdmin = async (token: string) => {
+const getUserInfo = async (token: string): Promise<JWTResponse | undefined> => {
   const resp = await fetch('http://host.docker.internal:8081/api/isAuthenticated', {
     method: 'GET',
     headers: {
       'x-access-token': token
     }
   })
-  const json: JWTResponse = await resp.json()
+  return (await resp.json())
+}
+
+const verifyAdmin = async (token: string) => {
+  const json = await getUserInfo(token)
   return json?.username === 'admin'
 }
 
@@ -100,10 +109,11 @@ app.get('/stats', async (req, res) => {
   }
 })
 
-app.post('/kill/:pid', async (req, res) => {
+app.post('/kill', async (req, res) => {
   const isAdmin = await verifyAdmin(req.headers['x-access-token'] as string)
   if (isAdmin) {
-    killTerminal(parseInt(req.params.pid))
+    const pid = (req.body as KillTerminalRequest).pid
+    killTerminal(pid)
     res.status(200).json({ message: 'Success' })
   } else {
     res.status(401).json({ message: 'Not authorized to kill terminals' })
@@ -111,13 +121,15 @@ app.post('/kill/:pid', async (req, res) => {
 })
 
 app.post('/run', async (req, res) => {
-  const { cols, rows, token, projectId } = req.body as TerminalSizeQuery & AuthQuery
+  const { cols, rows, projectId } = req.body as TerminalSizeQuery & ProjectQuery
+  const token = req.headers['x-access-token'] as string
   console.log('Attempting to load project ' + projectId)
-  // TODO: requester needs to ensure that project has first been saved
   const url = new URL('http://host.docker.internal:8081/api/project')
   const params = {projectId}
   url.search = new URLSearchParams(params).toString()
   try {
+    // The server automatically verifies that we're allowed to fetch this project via JWT,
+    // so no need for us to manually verify
     const fetchRes = await fetch(url, {
       method: 'GET',
       headers: {
@@ -128,8 +140,7 @@ app.post('/run', async (req, res) => {
     const resJson = await fetchRes.json()
     const project: Project = resJson.project
     if (!project) {
-      res.status(401).json({message: 'Unable to load project'})
-      return
+      return res.status(401).json({message: 'Unable to load project'})
     }
     const activeFiles = project.files.filter(file => file.active)
     const dirname = generateDirname(projectId)
@@ -158,6 +169,7 @@ app.post('/run', async (req, res) => {
       fs.rmSync(dirpath, { recursive: true, force: true })
       removeTerminal(pid)
     })
+
     const pid = saveTerminal(term, projectId, env.PWD)
     console.log('Created terminal with PID ' + pid.toString())
     res.status(200).json({
@@ -165,24 +177,25 @@ app.post('/run', async (req, res) => {
       pid: pid
     })
   } catch (e) {
-    console.log('!!!! Project load error: ', e)
+    console.log('Project load error: ', e)
     res.status(500).json({message: 'Error loading project'})
   }
 })
 
-// TODO: Check JWT upon accessing :pid route to ensure they have write access (store JWT with terminal store)
-app.post('/terminals/:pid/size', (req, res) => {
-  try {
-    const pid: number = parseInt(req.params.pid)
-    const query: TerminalSizeQuery = req.query as TerminalSizeQuery
-    updateTerminalSize(pid, parseInt(query.cols) || 80, parseInt(query.rows) || 24)
-  } catch {
-    res.status(400).json({ message: 'Illegal query' })
-  }
-})
+// If we end up doing this, make sure to check JWT upon accessing :pid route to ensure they
+// have write access (store JWT with terminal store)
+// app.post('/terminals/:pid/size', (req, res) => {
+//   try {
+//     const pid: number = parseInt(req.params.pid)
+//     const query: TerminalSizeQuery = req.query as TerminalSizeQuery
+//     updateTerminalSize(pid, parseInt(query.cols) || 80, parseInt(query.rows) || 24)
+//   } catch {
+//     res.status(400).json({ message: 'Illegal query' })
+//   }
+// })
 
 //@ts-ignore not sure why expressWs types aren't being picked up
-app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
+app.ws('/terminals/:pid', async (ws: WebSocket, req: Request) => {
   const buffer = (socket: WebSocket, timeout: number) => {
     let buffer: any[] = []
     let sender: NodeJS.Timeout | null = null
@@ -205,8 +218,10 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
     const pid = parseInt(req.params.pid)
     const send = buffer(ws, 5)
     const term: IPty | undefined = fetchTerminal(pid)
+
     if (term === undefined) {
-      // TODO: something
+      // Requested terminal doesn't exist
+      ws.send('\x1b[31mTerminal connection failure\x1b[0m\n')
       console.log('Terminal connection failure for pid ' + pid)
       return
     }
@@ -215,9 +230,7 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
     term.onData((data: string) => {
       try {
         send(data)
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     })
     //@ts-ignore figure out what type ws actually is
     ws.on('message', (msg: string) => {
@@ -228,7 +241,15 @@ app.ws('/terminals/:pid', (ws: WebSocket, req: Request) => {
       killTerminal(pid)
     })
   } catch {
-    // TODO: something
+    ws.send('\x1b[31mUnknown terminal failure\x1b[0m\n')
+    console.log('Unknown terminal error for pid ' + req.params.pid)
+    try {
+      const pid = parseInt(req.params.pid)
+      killTerminal(pid)
+    } catch {
+      console.log('\tUnable to kill terminal process ' + req.params.pid)
+    }
+    return
   }
 })
 

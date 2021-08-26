@@ -14,7 +14,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   // Abuse refs because we don't want to deal with re-renders
   const terminalRef = useRef<Xterm.Terminal | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
-  const showTerminalError = () => { terminalRef.current!.write('\n\n\x1b[31mCONNECTION LOST\n\n') }
+  const showTerminalError = () => { terminalRef.current!.write('\n\n\x1b[31mCONNECTION LOST\x1b[0m\n\n') }
   const [showCloseButton, setShowCloseButton] = useState(false)
 
   const lightTheme = {
@@ -46,12 +46,12 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
     fetch('http://localhost:3001/run', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-access-token': token
       },
       body: JSON.stringify({
         cols: term.cols,
         rows: term.rows,
-        token,
         projectId
       })
     }).then(res => res.json())

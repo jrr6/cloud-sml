@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Heading, IconButton, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { IoMdExit } from 'react-icons/all'
-import { TerminalStats, TerminalStatsResponse } from '../../../../runner/src/types/RunnerTypes'
+import { KillTerminalRequest, TerminalStats, TerminalStatsResponse } from '../../../../runner/src/types/RunnerTypes'
 import { LookupProjectsRequest, LookupProjectsResponse } from '../../../../server/src/types/serverTypes'
 
 type AugmentedTerminalStats = TerminalStats & {projectName: string, ownerName: string}
@@ -39,11 +39,15 @@ export const TerminalManager: React.FC<TerminalManagerProps> = ({ token }) => {
   }, [])
 
   const killTerminal = (pid: number) => () => {
-    fetch(`http://localhost:3001/kill/${pid}`, {
+    fetch('http://localhost:3001/kill', {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'x-access-token': token
-      }
+      },
+      body: JSON.stringify({
+        pid
+      } as KillTerminalRequest)
     }).then(() => { window.location.reload() })
   }
 
