@@ -8,9 +8,10 @@ import { wasmSupported } from '../util/wasmUtil'
 import { loadWASM } from 'onigasm'
 import { Registry } from 'monaco-textmate'
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import smlGrammar from '../monaco-config/sml.tmLanguage.json'
+import smlGrammar from '../monaco-config/sml.tmLanguage-fromtextmate.json'
 import darkTheme from '../monaco-config/theme-dark.json'
 import lightTheme from '../monaco-config/theme-light.json'
+import { createCompletions } from '../monaco-config/completions'
 
 type CodeEditorProps = {
   file: ProjectFile,
@@ -41,11 +42,33 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
       options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14}}
       beforeMount={monaco => {
         // Add SML as a language that VS Code recognizes support
-        monaco.languages.register({id: "sml"})
+        monaco.languages.register({
+          id: "sml",
+        })
+        monaco.languages.setLanguageConfiguration('sml', {
+          comments: {
+            blockComment: ['(*', '*)']
+          }
+        })
+        monaco.languages.registerCompletionItemProvider('sml', {
+          provideCompletionItems: (model, position) => {
+            const word = model.getWordUntilPosition(position)
+            const range = {
+              startLineNumber: position.lineNumber,
+              endLineNumber: position.lineNumber,
+              startColumn: word.startColumn,
+              endColumn: word.endColumn
+            }
+            return {
+              suggestions: createCompletions(monaco, range)
+            }
+          }
+        })
 
         if (useWasm) {
           //@ts-ignore apparently TS doesn't like JSON
           monaco.editor.defineTheme('sml-cloud-dark', darkTheme)
+          // TODO: fix command palette in light mode
           //@ts-ignore apparently TS doesn't like JSON
           monaco.editor.defineTheme('sml-cloud-light', lightTheme)
         } else {
@@ -85,7 +108,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
         }
       }}
       onChange={(newContents, _) => onEdit(newContents || "")}
-      // TODO: use fallback vs themes if no wasm
       theme={useColorModeValue(useWasm ? 'sml-cloud-light' : 'vs', useWasm ? 'sml-cloud-dark' : 'vs-dark')}
     />
     </>
