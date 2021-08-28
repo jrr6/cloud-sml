@@ -63,6 +63,8 @@ export class SimpleLanguageInfoProvider {
   private monaco: Monaco;
   private registry: Registry;
   private tokensProviderCache: TokensProviderCache;
+  // ADDED: hacky storage of CSS element for updates
+  private cssElement: HTMLStyleElement | undefined;
 
   constructor(private config: SimpleLanguageInfoProviderConfig) {
     const {grammars, fetchGrammar, theme, onigLib, monaco} = config;
@@ -118,8 +120,19 @@ export class SimpleLanguageInfoProvider {
     // This is needed to ensure the minimap gets the right colors.
     TokenizationRegistry.setColorMap(colorMap);
     const css = generateTokensCSSForColorMap(colorMap);
-    const style = createStyleElementForColorsCSS();
+    // ADDED: save style element for re-use
+    const style = this.cssElement ? this.cssElement : (this.cssElement = createStyleElementForColorsCSS());
     style.innerHTML = css;
+  }
+
+  /**
+   * ADDED: hacky way to ensure that React reloads don't leave us writing to a nonexistent element.
+   * Make sure to call this method before unloading the Editor component.
+   */
+  resetCSSInjection() {
+    console.log('resetting injector')
+    this.cssElement?.remove()
+    this.cssElement = undefined
   }
 
   async fetchLanguageInfo(language: LanguageId): Promise<LanguageInfo> {
@@ -151,6 +164,16 @@ export class SimpleLanguageInfoProvider {
       }
     }
     return null;
+  }
+
+  // ADDED: allow theme updates
+  /**
+   * Sets a new theme for this provider.
+   * NOTE: injectCSS() must be re-called in order for updates to take effect.
+   * @param theme the new theme to set.
+   */
+  public setTheme(theme: IRawTheme): void {
+    this.registry.setTheme(theme)
   }
 }
 
@@ -196,7 +219,6 @@ class TokensProviderCache {
     // Failure to do so means that the LanguageId cannot be read back later,
     // which can cause other Monaco features, such as "Toggle Line Comment",
     // to fail.
-    // FIXME: this call (loadGrammarWithConfiguration) fails
     const promise = this.registry
       .loadGrammarWithConfiguration(scopeName, encodedLanguageId, grammarConfiguration)
       .then((grammar: IGrammar | null) => {

@@ -1,0 +1,109 @@
+{
+  "base": "vs",
+  "inherit": true,
+  "rules": [
+    {
+      "foreground": "6f7785",
+      "token": "comment"
+    },
+    {
+      "foreground": "278022",
+      "token": "string"
+    },
+    {
+      "foreground": "bb2dbc",
+      "token": "constant.numeric"
+    },
+    {
+      "foreground": "e79199",
+      "token": "constant.language"
+    },
+    {
+      "foreground": "d62547",
+      "token": "constant.character"
+    },
+    {
+      "foreground": "d62547",
+      "token": "constant.other"
+    },
+    {
+      "foreground": "836e23",
+      "token": "variable"
+    },
+    {
+      "foreground": "2b73b2",
+      "token": "keyword"
+    },
+    {
+      "foreground": "d62547",
+      "token": "storage"
+    },
+    {
+      "foreground": "d62547",
+      "fontStyle": "italic",
+      "token": "storage.type"
+    },
+    {
+      "foreground": "d62547",
+      "token": "entity.name.class"
+    },
+    {
+      "foreground": "d62547",
+      "token": "entity.other.inherited-class"
+    },
+    {
+      "foreground": "8c46eb",
+      "token": "entity.name.function"
+    },
+    {
+      "foreground": "836e23",
+      "token": "variable.parameter"
+    },
+    {
+      "foreground": "d62547",
+      "token": "entity.name.tag"
+    },
+    {
+      "foreground": "8c46eb",
+      "token": "entity.other.attribute-name"
+    },
+    {
+      "foreground": "8c46eb",
+      "token": "support.function"
+    },
+    {
+      "foreground": "28798c",
+      "token": "support.constant"
+    },
+    {
+      "foreground": "d62547",
+      "token": "support.type"
+    },
+    {
+      "foreground": "d62547",
+      "token": "support.class"
+    },
+    {
+      "foreground": "d62547",
+      "fontStyle": " bold",
+      "token": "invalid"
+    },
+    {
+      "foreground": "8c46eb",
+      "fontStyle": " bold",
+      "token": "invalid.deprecated"
+    },
+    {
+      "foreground": "677080",
+      "token": "source.css\nmeta.property-list.css\nmeta.property-name.css\nsupport.type.property-name.css"
+    }
+  ],
+  "colors": {
+    "editor.foreground": "#7c8491",
+    "editor.background": "#f9f9fa",
+    "editor.selectionBackground": "#cfd2d7",
+    "editor.lineHighlightBackground": "#e4e5e9",
+    "editorCursor.foreground": "#8c46eb",
+    "editorWhitespace.foreground": "#e4e5e9"
+  }
+}

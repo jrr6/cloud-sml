@@ -7,8 +7,10 @@ import { CODE_FONTS } from '../util/Fonts'
 import { wasmSupported } from '../util/wasmUtil'
 import smlGrammar from '../monaco-config/sml.tmLanguage.json'
 import smlConfiguration from '../monaco-config/sml-configuration.json'
-import darkTheme from '../monaco-config/monaco-tm/vs-dark-plus-theme.json'
-import lightTheme from '../monaco-config/one-light.json'
+import darkTheme from '../monaco-config/theme-dark.json'
+import lightTheme from '../monaco-config/theme-light.json'
+import darkThemeBasis from '../monaco-config/theme-dark-basis.json'
+import lightThemeBasis from '../monaco-config/theme-light-basis.json'
 import { createCompletions } from '../monaco-config/completions'
 
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
@@ -32,15 +34,36 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
   const [colorChanger, setColorChanger] = React.useState(false)
   const providerRef = React.useRef<SimpleLanguageInfoProvider>()
 
+  // TODO: exiting and then re-entering the editor kills the color changer
+  // (so theme changes made on the Dashboard after leaving and before re-entering, or even changes made
+  // *within* the editor after leaving and re-entering, don't update the syntax colors correctly)
+
   // This is a terrible approach...but none of the good ones will work
   // (can't call toggleColorMode as action.run b/c doesn't update after the initial color change)
   const ColorChangerDummy: React.FC<{refresh: boolean}> = ({ refresh }) => {
-    const { toggleColorMode } = useColorMode()
-    React.useEffect(() => { if (refresh) { toggleColorMode(); setColorChanger(false) }}, [])
+    const colorModeObj = useColorMode()
+    const { toggleColorMode } = colorModeObj
+    React.useEffect(() => {
+      if (refresh) {
+        toggleColorMode()
+        setColorChanger(false)
+      }
+    }, [])
     return (<></>)
   }
-
   const useWasm = wasmSupported()
+  const isLight = useColorMode().colorMode === 'light'
+
+  React.useEffect(() => {
+    console.log('color update', !!providerRef.current)
+    providerRef.current?.setTheme(isLight ? lightTheme : darkTheme)
+    providerRef.current?.injectCSS()
+  }, [isLight])
+  // Ensure that when view is unloaded, we reset CSS injector element (can't return in above effect
+  // b/c will reset injector on each color change)
+  // Note that the seemingly pointless currying is actually necessary b/c this effect is called
+  // *before* providerRef is populated, so we need to wait to grab the reference at call-time
+  React.useEffect(() => () => { providerRef.current?.resetCSSInjection() }, [])
 
   return (
     <>
@@ -50,9 +73,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
       path={name}
       defaultLanguage="sml"
       defaultValue={contents}
-      options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14}}
+      options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14, minimap: {enabled: false}}}
       // TODO: move the configuration to a useMonaco or loader.init call beforehand
       beforeMount={(monaco) => (async () => {
+        //@ts-ignore apparently TS doesn't like JSON
+        monaco.editor.defineTheme('sml-cloud-dark', darkThemeBasis)
+        //@ts-ignore apparently TS doesn't like JSON
+        monaco.editor.defineTheme('sml-cloud-light', lightThemeBasis)
         if (!useWasm) {
           monaco.languages.register({id: 'sml'})
           // language IS IMonarchLanguage, I just can't figure out how to import the types...
@@ -97,7 +124,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
           fetchGrammar,
           configurations: languages.map((language) => language.id),
           fetchConfiguration,
-          theme: darkTheme, // TODO: adapt
+          theme: isLight ? lightTheme : darkTheme,
           onigLib,
           monaco
         })
@@ -121,11 +148,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
             }
           }
         })
-
-        //@ts-ignore apparently TS doesn't like JSON
-        // monaco.editor.defineTheme('sml-cloud-dark', darkTheme)
-        //@ts-ignore apparently TS doesn't like JSON
-        // monaco.editor.defineTheme('sml-cloud-light', lightTheme)
       })()}
       onMount={(editor, monaco) => {
         // Add ability to toggle dark/light appearance
@@ -147,8 +169,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
         tryInjection()
       }}
       onChange={(newContents, _) => onEdit(newContents || "")}
-      // theme={useColorModeValue(useWasm ? 'sml-cloud-light' : 'vs', useWasm ? 'sml-cloud-dark' : 'vs-dark')}
-      theme='vs-dark'
+      theme={useColorModeValue(useWasm ? 'sml-cloud-light' : 'vs', useWasm ? 'sml-cloud-dark' : 'vs-dark')}
     />
     </>
   )

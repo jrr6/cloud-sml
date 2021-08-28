@@ -1,5 +1,11 @@
 # Themes
 
+Using the new `vscode-textmate` approach, first follow the `plutil` instructions under "Language Grammars" to convert a `tmTheme` plist file to JSON, then load that JSON directly in the `SimpleLanguageInfoProvider`. However, to ensure various other UI elements are correctly colored, you'll also need to use a "basis theme" as specified below.
+
+---
+
+These directions are for using `monaco-editor-textmate` (which never quite seemed to work) as well as generating a "basis theme" for the `vscode-textmate` approach:
+
 Themes can be added in one of two ways (method 2 seems to work better?—see note below):
 
 1. Pull `.json` VS Code themes from VS Code extensions (for instance, `~/.vscode/extensions/zhuangtongfa.material-theme-3.11.4/themes/OneDark-Pro-flat.json`). Then run, e.g., `npx monaco-vscode-textmate-theme-converter -i ~/Downloads/OneDark-Pro-flat.json -o themes/dark.json` to convert the VS Code JSON to Monaco JSON.
@@ -21,7 +27,9 @@ It may also be necessary to change some CSS properties. For instance, the Atom t
 
 Lastly, some light themes might use `vs-dark` as their base, which makes the command palette look terrible. Switch the base to `vs` to resolve this issue.
 
-Current theme is Atom One Dark/Light. Previously considered [RoRvsWild](https://www.rorvswild.com/theme).
+---
+
+Current theme is [RoRvsWild](https://www.rorvswild.com/theme).
 
 # Language Grammars
 
