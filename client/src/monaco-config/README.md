@@ -29,3 +29,7 @@ To generate the language grammar JSON file, use one of the two following methods
 
 1. Pull the TextMate grammar file (e.g., https://github.com/textmate/standard-ml.tmbundle/blob/master/Syntaxes/Standard%20ML.plist) and then use `plutil -convert json grammar.plist -o sml.tmLanguage.json` to generate a JSON version.
 2. Copy an existing VS Code `.tmLanguage.json` file (or, in the case of the SML extension, just `.json`) into this directory.
+
+# monaco-tm
+
+Based on [monaco-tm](https://github.com/bolinfest/monaco-tm), which seems to allow TextMate grammars to work properly (unlike the `monaco-editor-textmate` approach).

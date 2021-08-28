@@ -53,8 +53,15 @@ registerLookupProjectsHandler()
 app.use('/api', router)
 // TODO: figure out what's wrong with the following:
 // app.use('/resources', express.static(__dirname + '../resources'))
-app.get('/resources/onigasm.wasm', (req, res) => {
-  res.sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/server/resources/onigasm.wasm')
+app.get('/resources/onig.wasm', (req, res) => {
+  res
+    .contentType('application/wasm')
+    .sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/server/resources/onig.wasm')
+})
+// THIS IS JUST FOR DEBUGGING
+app.get('*', (req, res) => {
+  res
+    .sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/client/src/monaco-config/sml.tmLanguage.json')
 })
 // app.get('*', (req, res) => {
 //   res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
