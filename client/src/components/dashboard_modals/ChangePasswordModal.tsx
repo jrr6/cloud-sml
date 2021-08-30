@@ -52,7 +52,7 @@ export const ChangePasswordModal: React.FC<DashModalProps &
     e.preventDefault()
     setLoading(true)
     if (token !== null) {
-      fetchOrLogin('http://localhost:8081/api/changePassword', {
+      fetchOrLogin('/api/changePassword', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',

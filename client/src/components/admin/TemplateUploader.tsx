@@ -26,7 +26,7 @@ export const TemplateUploader: React.FC<TemplateUploaderProps> = ({ token }) => 
         contents: await file.text()
       }))
     ).then((fileObjs: ProjectFile[]) =>
-      fetch('http://localhost:8081/api/uploadTemplate', {
+      fetch('/api/uploadTemplate', {
         method: 'POST',
         headers: {
           'x-access-token': token,

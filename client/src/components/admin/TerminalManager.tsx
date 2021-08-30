@@ -18,7 +18,7 @@ export const TerminalManager: React.FC<TerminalManagerProps> = ({ token }) => {
     }).then(res => res.json())
       .then(async (json: TerminalStatsResponse) => {
         // Once we have the terminals, we need to look up the associated user/project info for each
-        const lookupRes = await fetch('http://localhost:8081/api/lookupProjects', {
+        const lookupRes = await fetch('/api/lookupProjects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

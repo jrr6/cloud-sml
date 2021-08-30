@@ -69,7 +69,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       setOpenIdx(fileIdx)
       // Remembering open file is more of a convenience,
       // so we won't worry about following up on the promise
-      fetchOrLogin('http://localhost:8081/api/setOpenFile', {
+      fetchOrLogin('/api/setOpenFile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     const newFile = {name: oldFile.name, contents: oldFile.contents, active: newState}
     setFiles([...files.slice(0, fileIdx), newFile, ...files.slice(fileIdx + 1)])
     // Another "convenience," so we ignore the promise
-    fetchOrLogin('http://localhost:8081/api/toggleFile', {
+    fetchOrLogin('/api/toggleFile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   const performSave = () => new Promise((res, rej) => {
     if (token == null) return rej()
-    fetchOrLogin('http://localhost:8081/api/saveFile', {
+    fetchOrLogin('/api/saveFile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

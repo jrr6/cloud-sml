@@ -24,7 +24,7 @@ export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken, onClo
   // Fetch templates anew each time we open the modal (hence isOpen dep)
   useEffect(() => {
     if (isOpen && token !== null) {
-      fetchOrLogin('http://localhost:8081/api/templates', {
+      fetchOrLogin('/api/templates', {
         method: 'GET',
         headers: {
           'x-access-token': token
@@ -36,7 +36,7 @@ export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken, onClo
   }, [isOpen])
 
   const cloneTemplate = (templateId: string) => {
-    fetchOrLogin('http://localhost:8081/api/cloneTemplate', {
+    fetchOrLogin('/api/cloneTemplate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

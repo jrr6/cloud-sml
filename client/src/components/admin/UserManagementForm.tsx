@@ -58,7 +58,7 @@ export const UserManagementForm: React.FC<UserManagementFormProps> = ({ token })
     e.preventDefault();
 
     (action === 'Register'
-      ? fetch('http://localhost:8081/api/register', {
+      ? fetch('/api/register', {
         method: 'POST',
         headers: {
           'x-access-token': token,
@@ -69,7 +69,7 @@ export const UserManagementForm: React.FC<UserManagementFormProps> = ({ token })
           password
         })
       })
-      : fetch('http://localhost:8081/api/changePassword', {
+      : fetch('/api/changePassword', {
         method: 'POST',
         headers: {
           'x-access-token': token,

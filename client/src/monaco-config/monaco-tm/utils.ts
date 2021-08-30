@@ -1,5 +1,5 @@
 export async function loadVSCodeOnigurumWASM(): Promise<Response | ArrayBuffer> {
-  const response = await fetch('http://localhost:8081/resources/onig.wasm');
+  const response = await fetch('/resources/onig.wasm');
   const contentType = response.headers.get('content-type');
   if (contentType === 'application/wasm') {
     return response;

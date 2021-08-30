@@ -18,7 +18,7 @@ type LoginPageProps = {
 }
 
 const postLoginReq = (creds: {username: string, password: string}) =>
-  fetch('http://localhost:8081/api/login', {
+  fetch('/api/login', {
     method: 'POST',
     headers: {
       'Content-type': 'application/json'
@@ -37,7 +37,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ token, setAuth }) => {
 
   useEffect(() => {
     if (token !== null) {
-      fetch('http://localhost:8081/api/isAuthenticated', {
+      fetch('/api/isAuthenticated', {
         method: 'GET',
         headers: {
           'x-access-token': token

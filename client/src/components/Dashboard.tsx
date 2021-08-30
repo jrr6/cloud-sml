@@ -51,7 +51,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
   useEffect(() => {
     if (token === null || !needsRefresh) return
 
-    fetchOrLogin('http://localhost:8081/api/userProjects', {
+    fetchOrLogin('/api/userProjects', {
       method: 'GET',
       headers: {
         'x-access-token': token

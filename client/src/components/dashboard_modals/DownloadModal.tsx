@@ -20,7 +20,7 @@ export const DownloadModal: React.FC<DashModalProps & {token: AuthToken}> =
   const downloadFiles = () => {
     if (token === null) return;
     setLoading(true)
-    fetchOrLogin('http://localhost:8081/api/downloadFiles', {
+    fetchOrLogin('/api/downloadFiles', {
       method: 'GET',
       headers: {
         'x-access-token': token
