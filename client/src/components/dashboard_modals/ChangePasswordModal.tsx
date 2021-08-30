@@ -12,6 +12,7 @@ import {
 import { DashModalProps } from '../../types/modalTypes'
 import { AuthToken } from '../../types/authTypes'
 import { useHistory } from 'react-router-dom'
+import { fetchOrLogin } from '../../util/FetchTools'
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -51,7 +52,7 @@ export const ChangePasswordModal: React.FC<DashModalProps &
     e.preventDefault()
     setLoading(true)
     if (token !== null) {
-      fetch('http://localhost:8081/api/changePassword', {
+      fetchOrLogin('http://localhost:8081/api/changePassword', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
@@ -61,7 +62,7 @@ export const ChangePasswordModal: React.FC<DashModalProps &
           oldPassword: current,
           newPassword: newIn
         })
-      })
+      }, history)
         .then(res => {
           if (res.ok) {
             setLoginError(false)

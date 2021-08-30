@@ -5,6 +5,7 @@ import { CodeEditor } from './CodeEditor'
 import { FileList } from './FileList'
 import { Project, ProjectFile } from '../../../server/src/models/Project'
 import { Terminal } from './Terminal'
+import { fetchOrLogin } from '../util/FetchTools'
 
 type ProjectViewProps = { token: string }
 export enum SaveState {
@@ -68,7 +69,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
       setOpenIdx(fileIdx)
       // Remembering open file is more of a convenience,
       // so we won't worry about following up on the promise
-      fetch('http://localhost:8081/api/setOpenFile', {
+      fetchOrLogin('http://localhost:8081/api/setOpenFile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
           projectId: id,
           fileIdx
         })
-      })
+      }, history)
     }
 
     if (activeFileContents.current !== undefined) {
@@ -95,7 +96,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     const newFile = {name: oldFile.name, contents: oldFile.contents, active: newState}
     setFiles([...files.slice(0, fileIdx), newFile, ...files.slice(fileIdx + 1)])
     // Another "convenience," so we ignore the promise
-    fetch('http://localhost:8081/api/toggleFile', {
+    fetchOrLogin('http://localhost:8081/api/toggleFile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
         fileIdx,
         active: newState
       })
-    })
+    }, history)
   }
   const onEdit = (contents: string) => {
     setSaveState(SaveState.Saving)
@@ -139,7 +140,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
 
   const performSave = () => new Promise((res, rej) => {
     if (token == null) return rej()
-    fetch('http://localhost:8081/api/saveFile', {
+    fetchOrLogin('http://localhost:8081/api/saveFile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
         fileIdx: openIdx,
         newContents: activeFileContents.current
       })
-    })
+    }, history)
       .then(resp => {
         if (resp.ok) {
           setSaveState(SaveState.Saved)
@@ -174,13 +175,12 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
     const params = {projectId: id}
     url.search = new URLSearchParams(params).toString()
 
-    //@ts-ignore URLs are perfectly valid arguments to fetch
-    fetch(url, {
+    fetchOrLogin(url, {
       method: 'GET',
       headers: {
         'x-access-token': token
       }
-    })
+    }, history)
       .then(res => res.json())
       // TODO: fail gracefully (i.e., redirect to login) if token is invalid
       .then(projResp => {

@@ -6,6 +6,8 @@ import '../styles/xterm.css'
 import '../styles/xterm-tweaks.css'
 import { Box, CloseButton, useColorMode, useColorModeValue } from '@chakra-ui/react'
 import { CODE_FONTS } from '../util/Fonts'
+import { fetchOrLogin } from '../util/FetchTools'
+import { useHistory } from 'react-router-dom'
 
 type TerminalProps = { token: string, projectId: string, lastRun: Date | null, onClose: () => void }
 
@@ -17,6 +19,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
   const showTerminalError = () => { terminalRef.current!.write('\r\n\n\x1b[31;1mTerminal disconnected\x1b[0m\r\n\n') }
   const [showCloseButton, setShowCloseButton] = useState(false)
   const { colorMode } = useColorMode()
+  const history = useHistory()
 
   const lightTheme = {
     background: '#fff',
@@ -43,7 +46,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
     term.open(terminalDivRef.current!)
     fitAddon.fit()
 
-    fetch('http://localhost:3001/run', {
+    fetchOrLogin('http://localhost:3001/run', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
         rows: term.rows,
         projectId
       })
-    }).then(res => res.json())
+    }, history).then(res => res.json())
       .then(({ pid }) => {
         const socket = new WebSocket(`ws://localhost:3001/terminals/${pid}`)
         socket.onclose = showTerminalError

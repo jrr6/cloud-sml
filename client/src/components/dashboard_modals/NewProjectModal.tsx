@@ -14,26 +14,29 @@ import React, { useEffect, useState } from 'react'
 import { DashModalProps } from '../../types/modalTypes'
 import { ProjectTemplate } from '../../../../server/src/models/ProjectTemplate'
 import { AuthToken } from '../../types/authTypes'
+import { useHistory } from 'react-router-dom'
+import { fetchOrLogin } from '../../util/FetchTools'
 
 export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken, onClone: () => void}> =
   ({ isOpen, onClose, token, onClone }) => {
   const [templates, setTemplates] = useState([] as ProjectTemplate[])
+  const history = useHistory()
   // Fetch templates anew each time we open the modal (hence isOpen dep)
   useEffect(() => {
     if (isOpen && token !== null) {
-      fetch('http://localhost:8081/api/templates', {
+      fetchOrLogin('http://localhost:8081/api/templates', {
         method: 'GET',
         headers: {
           'x-access-token': token
         }
-      })
+      }, history)
         .then(res => res.json())
         .then(resBody => setTemplates(resBody.templates))
     }
   }, [isOpen])
 
   const cloneTemplate = (templateId: string) => {
-    fetch('http://localhost:8081/api/cloneTemplate', {
+    fetchOrLogin('http://localhost:8081/api/cloneTemplate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +45,7 @@ export const NewProjectModal: React.FC<DashModalProps & {token: AuthToken, onClo
       body: JSON.stringify({
         templateId
       })
-    }).then(res => {
+    }, history).then(res => {
        if (res.ok) {
          onClone()
          onClose()

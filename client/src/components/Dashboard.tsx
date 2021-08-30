@@ -21,6 +21,7 @@ import { DownloadModal } from './dashboard_modals/DownloadModal'
 import { NewProjectModal } from './dashboard_modals/NewProjectModal'
 import { Project } from '../../../server/src/models/Project'
 import { ProjectDescriptor } from '../../../server/src/types/serverTypes'
+import { fetchOrLogin } from '../util/FetchTools'
 
 type DashboardProps = {
   token: AuthToken,
@@ -50,12 +51,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ token, clearToken, usernam
   useEffect(() => {
     if (token === null || !needsRefresh) return
 
-    fetch('http://localhost:8081/api/userProjects', {
+    fetchOrLogin('http://localhost:8081/api/userProjects', {
       method: 'GET',
       headers: {
         'x-access-token': token
       }
-    })
+    }, history)
       .then(res => res.json())
       .then(projObj => {
         const { projects } = projObj

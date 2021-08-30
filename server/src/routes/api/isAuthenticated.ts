@@ -5,11 +5,12 @@ import { JWT_SIGNING_KEY } from '../../utils/authConfig'
 import { router } from '../../server'
 import { JWTResponse } from '../../types/serverTypes'
 
+export const INVALID_TOKEN_RESPONSE_CODE = 441
 export const verifyJWT: RequestHandler = (req, res, next) => {
   const tokenHeader = req.headers['x-access-token'] as string | undefined
   const token = tokenHeader?.split(' ')[1]
   if (token === undefined) {
-    return res.status(401).json({ message: 'Invalid token', isLoggedIn: false })
+    return res.status(INVALID_TOKEN_RESPONSE_CODE).json({ message: 'Invalid token', isLoggedIn: false })
   }
   promisify(verify)(token, JWT_SIGNING_KEY)
     .then(decoded => {
@@ -19,7 +20,7 @@ export const verifyJWT: RequestHandler = (req, res, next) => {
       }
       next()
     })
-    .catch(_ => res.status(401).json({
+    .catch(_ => res.status(INVALID_TOKEN_RESPONSE_CODE).json({
       message: 'Invalid token',
       isLoggedIn: false
     }))

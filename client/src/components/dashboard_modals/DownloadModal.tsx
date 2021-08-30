@@ -10,19 +10,22 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { AuthToken } from '../../types/authTypes'
+import { useHistory } from 'react-router-dom'
+import { fetchOrLogin } from '../../util/FetchTools'
 
 export const DownloadModal: React.FC<DashModalProps & {token: AuthToken}> =
   ({ isOpen, onClose, token }) => {
   const [loading, setLoading] = useState(false)
+  const history = useHistory()
   const downloadFiles = () => {
     if (token === null) return;
     setLoading(true)
-    fetch('http://localhost:8081/api/downloadFiles', {
+    fetchOrLogin('http://localhost:8081/api/downloadFiles', {
       method: 'GET',
       headers: {
         'x-access-token': token
       }
-    })
+    }, history)
       .then(res => res.blob())
       .then(blob => {
         const file = new File([blob], 'cloudsml-export.zip', { type: 'application/zip' })
