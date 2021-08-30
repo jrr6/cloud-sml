@@ -55,7 +55,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
   const isLight = useColorMode().colorMode === 'light'
 
   React.useEffect(() => {
-    console.log('color update', !!providerRef.current)
+    // No-op on the first run, but if color changes in future this will make sure syntax updates too
+    // (regardless of who triggered the change)
     providerRef.current?.setTheme(isLight ? lightTheme : darkTheme)
     providerRef.current?.injectCSS()
   }, [isLight])
@@ -73,7 +74,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({onEdit, file: { name, con
       path={name}
       defaultLanguage="sml"
       defaultValue={contents}
-      options={{tabSize: 2, fontFamily: CODE_FONTS, fontSize: 14, minimap: {enabled: false}}}
+      options={{
+        tabSize: 2,
+        fontFamily: CODE_FONTS,
+        fontSize: 14,
+        minimap: {enabled: false},
+        rulers: [80]
+      }}
       // TODO: move the configuration to a useMonaco or loader.init call beforehand
       beforeMount={(monaco) => (async () => {
         //@ts-ignore apparently TS doesn't like JSON

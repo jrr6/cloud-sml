@@ -130,7 +130,6 @@ export class SimpleLanguageInfoProvider {
    * Make sure to call this method before unloading the Editor component.
    */
   resetCSSInjection() {
-    console.log('resetting injector')
     this.cssElement?.remove()
     this.cssElement = undefined
   }
