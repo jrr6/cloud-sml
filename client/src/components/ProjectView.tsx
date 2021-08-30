@@ -171,7 +171,7 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ token }) => {
   useEffect(() => {
     if (token === null) return
 
-    const url = new URL('http://localhost:8081/api/project')
+    const url = new URL('/api/project', window.location.origin)
     const params = {projectId: id}
     url.search = new URLSearchParams(params).toString()
 
