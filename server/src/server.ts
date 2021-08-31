@@ -51,20 +51,16 @@ registerToggleFileHandler()
 registerLookupProjectsHandler()
 
 app.use('/api', router)
-// TODO: figure out what's wrong with the following:
-// app.use('/resources', express.static(__dirname + '../resources'))
-app.get('/resources/onig.wasm', (req, res) => {
-  res
-    .contentType('application/wasm')
-    .sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/server/resources/onig.wasm')
-})
-// THIS IS JUST FOR DEBUGGING
-app.get('*', (req, res) => {
-  res
-    .sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/client/src/monaco-config/sml.tmLanguage.json')
-})
-// app.get('*', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+// For some reason, using path.resolve with __dirname doesn't work
+app.use('/resources', express.static('resources'))
+// app.get('/resources/onig.wasm', (req, res) => {
+//   res
+//     .contentType('application/wasm')
+//     .sendFile('/Users/jrr6/Documents/JS Projects/cloud-sml/server/resources/onig.wasm')
 // })
+app.use(express.static(path.resolve(__dirname, '../../client/build')))
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+})
 
 app.listen(8081, () => console.log('Server is running on http://localhost:8081/'))

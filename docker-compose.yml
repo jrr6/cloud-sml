@@ -1,19 +1,31 @@
 services:
-#  runner:
-#    build:
-#      context: runner/
-#      dockerfile: runner/Dockerfile
-#    ports:
-#      - 3001:3001
-#    container_name: cloud-sml-runner
   database:
+    container_name: cloud-sml-db
     image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: sDTxh0i2iNR_!8kleSF
     restart: always
     ports:
+      # We shouldn't really need to expose this, since all server communication is internal to Docker
+      # However, since we're still relying on Compass for server tweaking, we'll leave it be for the time being
       - 27017:27017
-    container_name: cloud-sml-db
     volumes:
       - ./db:/data/db
+  runner:
+    container_name: cloud-sml-runner
+    build:
+      context: runner/
+    restart: always
+    ports:
+      - 3001:3001
+  server:
+    container_name: cloud-sml-server
+    build:
+      context: ./
+      dockerfile: ./server/Dockerfile
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on:
+      - "database"

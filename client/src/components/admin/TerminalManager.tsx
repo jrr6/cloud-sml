@@ -10,7 +10,7 @@ type TerminalManagerProps = { token: string }
 export const TerminalManager: React.FC<TerminalManagerProps> = ({ token }) => {
   const [entries, setEntries] = useState<AugmentedTerminalStats[]>([])
   useEffect(() => {
-    fetch('http://localhost:3001/stats', {
+    fetch('http://runner/stats', {
       method: 'GET',
       headers: {
         'x-access-token': token
@@ -39,7 +39,7 @@ export const TerminalManager: React.FC<TerminalManagerProps> = ({ token }) => {
   }, [])
 
   const killTerminal = (pid: number) => () => {
-    fetch('http://localhost:3001/kill', {
+    fetch('http://runner/kill', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -4,6 +4,7 @@
   "description": "",
   "main": "build/server.js",
   "scripts": {
+    "build": "tsc",
     "start": "tsc -w & nodemon -q -w build build/server.js"
   },
   "repository": {

@@ -77,7 +77,7 @@ const generateDirname = (projectId: string): string => {
 }
 
 const getUserInfo = async (token: string): Promise<JWTResponse | undefined> => {
-  const resp = await fetch('http://host.docker.internal:8081/api/isAuthenticated', {
+  const resp = await fetch('http://server:8081/api/isAuthenticated', {
     method: 'GET',
     headers: {
       'x-access-token': token
@@ -131,7 +131,7 @@ app.post('/run', async (req, res) => {
   const { cols, rows, projectId } = req.body as TerminalSizeQuery & ProjectQuery
   const token = req.headers['x-access-token'] as string
   console.log('Attempting to load project ' + projectId)
-  const url = new URL('http://host.docker.internal:8081/api/project')
+  const url = new URL('http://server:8081/api/project')
   const params = {projectId}
   url.search = new URLSearchParams(params).toString()
   try {

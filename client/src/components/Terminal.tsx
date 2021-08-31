@@ -46,7 +46,7 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
     term.open(terminalDivRef.current!)
     fitAddon.fit()
 
-    fetchOrLogin('http://localhost:3001/run', {
+    fetchOrLogin(`http://${window.location.hostname}:3001/run`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,11 +59,10 @@ export const Terminal: React.FC<TerminalProps> = ({ token, projectId, lastRun, o
       })
     }, history).then(res => res.json())
       .then(({ pid }) => {
-        const socket = new WebSocket(`ws://localhost:3001/terminals/${pid}`)
+        const socket = new WebSocket(`ws://${window.location.hostname}:3001/terminals/${pid}`)
         socket.onclose = showTerminalError
         socket.onerror = showTerminalError
         socket.onopen = () => {
-          console.log('socket connected')
           term.loadAddon(new AttachAddon(socket))
         }
         socketRef.current = socket
